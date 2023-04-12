@@ -1,0 +1,2372 @@
+<!--
+  Copyright 2021 Google LLC
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+      https://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Locator</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/handlebars/4.7.7/handlebars.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css?family=Roboto"
+      rel="stylesheet"
+    />
+    <style>
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+
+      #map-container {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        font-family: "Roboto", sans-serif;
+        box-sizing: border-box;
+      }
+
+      #map-container a {
+        text-decoration: none;
+        color: #1967d2;
+      }
+
+      #map-container button {
+        background: none;
+        color: inherit;
+        border: none;
+        padding: 0;
+        font: inherit;
+        font-size: inherit;
+        cursor: pointer;
+      }
+
+      #gmp-map {
+        position: absolute;
+        left: 25em;
+        top: 0;
+        right: 0;
+        bottom: 0;
+      }
+
+      #locations-panel {
+        position: absolute;
+        left: 0;
+        width: 25em;
+        top: 0;
+        bottom: 0;
+        overflow-y: auto;
+        background: white;
+        padding: 0.5em;
+        box-sizing: border-box;
+      }
+
+      @media only screen and (max-width: 876px) {
+        #gmp-map {
+          left: 0;
+          bottom: 50%;
+        }
+
+        #locations-panel {
+          top: 50%;
+          right: 0;
+          width: unset;
+        }
+      }
+
+      #locations-panel-list > header {
+        padding: 1.4em 1.4em 0 1.4em;
+      }
+
+      #locations-panel-list h1.search-title {
+        font-size: 1em;
+        font-weight: 500;
+        margin: 0;
+      }
+
+      #locations-panel-list h1.search-title > img {
+        vertical-align: bottom;
+        margin-top: -1em;
+      }
+
+      #locations-panel-list .search-input {
+        width: 100%;
+        margin-top: 0.8em;
+        position: relative;
+      }
+
+      #locations-panel-list .search-input input {
+        width: 100%;
+        border: 1px solid rgba(0, 0, 0, 0.2);
+        border-radius: 0.3em;
+        height: 2.2em;
+        box-sizing: border-box;
+        padding: 0 2.5em 0 1em;
+        font-size: 1em;
+      }
+
+      #locations-panel-list .search-input-overlay {
+        position: absolute;
+      }
+
+      #locations-panel-list .search-input-overlay.search {
+        right: 2px;
+        top: 2px;
+        bottom: 2px;
+        width: 2.4em;
+      }
+
+      #locations-panel-list .search-input-overlay.search button {
+        width: 100%;
+        height: 100%;
+        border-radius: 0.2em;
+        color: black;
+        background: transparent;
+      }
+
+      #locations-panel-list .search-input-overlay.search .icon {
+        margin-top: 0.05em;
+        vertical-align: top;
+      }
+
+      #locations-panel-list .section-name {
+        font-weight: 500;
+        font-size: 0.9em;
+        margin: 1.8em 0 1em 1.5em;
+      }
+
+      #locations-panel-list .location-result {
+        position: relative;
+        padding: 0.8em 3.5em 0.8em 1.4em;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+        cursor: pointer;
+      }
+
+      #locations-panel-list .location-result:first-of-type {
+        border-top: 1px solid rgba(0, 0, 0, 0.12);
+      }
+
+      #locations-panel-list .location-result:last-of-type {
+        border-bottom: none;
+      }
+
+      #locations-panel-list .location-result.selected {
+        outline: 2px solid #4285f4;
+      }
+
+      #locations-panel-list button.select-location {
+        margin-bottom: 0.6em;
+        text-align: left;
+      }
+
+      #locations-panel-list .location-result h2.name {
+        font-size: 1em;
+        font-weight: 500;
+        margin: 0;
+      }
+
+      #locations-panel-list .location-result .address {
+        font-size: 0.9em;
+        margin-bottom: 0.5em;
+      }
+
+      #locations-panel-list .directions-button {
+        position: absolute;
+        right: 1.2em;
+        top: 2.3em;
+      }
+
+      #locations-panel-list .directions-button-background:hover {
+        fill: rgba(116, 120, 127, 0.1);
+      }
+
+      #locations-panel-list .directions-button-background {
+        fill: rgba(255, 255, 255, 0.01);
+      }
+
+      #locations-panel-list .location-result .distance {
+        position: absolute;
+        top: 0.9em;
+        right: 0;
+        text-align: center;
+        font-size: 0.9em;
+        width: 5em;
+      }
+
+      #locations-panel-list .option-container {
+        display: inline-block;
+        margin: 0.2em 0;
+        position: relative;
+      }
+
+      #locations-panel-list .option-container button:hover,
+      #locations-panel-list .option-container a:hover {
+        background-color: #f1f3f4;
+      }
+
+      #locations-panel-list .option {
+        border: 1px solid #bdc1c6;
+        border-radius: 0.9em;
+        color: #1967d2;
+        font-size: 0.9em;
+        font-weight: 500;
+        padding: 0.3em 0;
+      }
+
+      #locations-panel-list .option > span {
+        margin: 0 0.9em;
+      }
+
+      #locations-panel-list .action-button .option {
+        align-items: center;
+        display: flex;
+      }
+
+      #locations-panel-list .action-button img {
+        /* Match link color #1967d2 */
+        filter: invert(30%) sepia(67%) saturate(7379%) hue-rotate(209deg)
+          brightness(95%) contrast(80%);
+        height: 1.5em;
+        margin: -0.2em;
+        width: 2.5em;
+      }
+
+      #locations-panel-list .action-button .open-icon {
+        height: 1.2em;
+      }
+
+      #locations-panel-list .split-action-button {
+        display: flex;
+      }
+
+      #locations-panel-list .split-action-button .option:first-child {
+        border-radius: 0.9em 0 0 0.9em;
+      }
+
+      #locations-panel-list .split-action-button .option:last-child {
+        border-radius: 0 0.9em 0.9em 0;
+        margin-left: -1px;
+      }
+
+      #locations-panel-list .action-button:not(.split-action-button) span {
+        margin-right: 0.3em;
+      }
+
+      #locations-panel-list .action-dropdown {
+        background-color: white;
+        box-shadow: 0 4px 10px rgb(60 64 67 / 28%);
+        display: none;
+        position: absolute;
+        z-index: 10;
+      }
+
+      #locations-panel-list .action-dropdown a {
+        color: black;
+        display: flex;
+        line-height: 1.8em;
+        padding: 0.6em 1.2em;
+        white-space: nowrap;
+      }
+
+      #locations-panel-list .action-dropdown img {
+        height: 1.8em;
+        padding-right: 0.6em;
+        width: 1.8em;
+      }
+
+      #location-results-list {
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+      }
+
+      /* ------------- DETAILS PANEL ------------------------------- */
+      #locations-panel-details {
+        padding: 1.4em;
+        box-sizing: border-box;
+        display: none;
+      }
+
+      #locations-panel-details .back-button {
+        font-size: 1em;
+        font-weight: 500;
+        color: #1967d2;
+        display: block;
+        text-decoration: none;
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 0;
+        font-family: inherit;
+      }
+
+      #locations-panel-details .back-button .icon {
+        width: 20px;
+        height: 20px;
+        vertical-align: bottom;
+
+        /* Match link color #1967d2 */
+        filter: invert(30%) sepia(67%) saturate(7379%) hue-rotate(209deg)
+          brightness(95%) contrast(80%);
+      }
+
+      #locations-panel-details > header {
+        text-align: center;
+      }
+
+      #locations-panel-details .banner {
+        margin-top: 1em;
+      }
+
+      #locations-panel-details h2 {
+        font-size: 1.1em;
+        font-weight: 500;
+        margin-bottom: 0.3em;
+      }
+
+      #locations-panel-details .distance {
+        font-size: 0.9em;
+        text-align: center;
+      }
+
+      #locations-panel-details .address {
+        text-align: center;
+        font-size: 0.9em;
+        margin-top: 1.3em;
+      }
+
+      #locations-panel-details .atmosphere {
+        text-align: center;
+        font-size: 0.9em;
+        margin: 0.8em 0;
+      }
+
+      #locations-panel-details .star-rating-numeric {
+        color: #555;
+      }
+
+      #locations-panel-details .star-icon {
+        width: 1.2em;
+        height: 1.2em;
+        margin-right: -0.3em;
+        margin-top: -0.08em;
+        vertical-align: top;
+        filter: invert(88%) sepia(60%) saturate(2073%) hue-rotate(318deg)
+          brightness(93%) contrast(104%);
+      }
+
+      #locations-panel-details .star-icon:last-of-type {
+        margin-right: 0.2em;
+      }
+
+      #locations-panel-details .price-dollars {
+        color: #555;
+      }
+
+      #locations-panel-details hr {
+        height: 1px;
+        color: rgba(0, 0, 0, 0.12);
+        background-color: rgba(0, 0, 0, 0.12);
+        border: none;
+        margin-bottom: 1em;
+      }
+
+      #locations-panel-details .contact {
+        font-size: 0.9em;
+        margin: 0.8em 0;
+        display: flex;
+        align-items: center;
+      }
+
+      #locations-panel-details .contact .icon {
+        flex: 0 0 auto;
+        width: 1.5em;
+        height: 1.5em;
+      }
+
+      #locations-panel-details .contact .right {
+        padding: 0.1em 0 0 1em;
+      }
+
+      #locations-panel-details .hours .weekday {
+        display: inline-block;
+        width: 5em;
+      }
+
+      #locations-panel-details .website a {
+        white-space: nowrap;
+        display: inline-block;
+        overflow: hidden;
+        max-width: 16em;
+        text-overflow: ellipsis;
+      }
+
+      #locations-panel-details p.attribution {
+        color: #777;
+        margin: 0;
+        font-size: 0.8em;
+        font-style: italic;
+      }
+    </style>
+    <script>
+      "use strict";
+
+      /** Hide a DOM element. */
+      function hideElement(el) {
+        el.style.display = "none";
+      }
+
+      /** Show a DOM element that has been hidden. */
+      function showElement(el) {
+        el.style.display = "block";
+      }
+
+      /** Helper function to generate a Google Maps directions URL */
+      function generateDirectionsURL(origin, destination) {
+        const googleMapsUrlBase = "https://www.google.com/maps/dir/?";
+        const searchParams = new URLSearchParams("api=1");
+        searchParams.append("origin", origin);
+        const destinationParam = [];
+        // Add title to destinationParam except in cases where Quick Builder set
+        // the title to the first line of the address
+        if (destination.title !== destination.address1) {
+          destinationParam.push(destination.title);
+        }
+        destinationParam.push(destination.address1, destination.address2);
+        searchParams.append("destination", destinationParam.join(","));
+        return googleMapsUrlBase + searchParams.toString();
+      }
+
+      /**
+       * Defines an instance of the Locator+ solution, to be instantiated
+       * when the Maps library is loaded.
+       */
+      function LocatorPlus(configuration) {
+        const locator = this;
+
+        locator.locations = configuration.locations || [];
+        locator.capabilities = configuration.capabilities || {};
+
+        const mapEl = document.getElementById("gmp-map");
+        const panelEl = document.getElementById("locations-panel");
+        locator.panelListEl = document.getElementById("locations-panel-list");
+        const sectionNameEl = document.getElementById(
+          "location-results-section-name"
+        );
+        const resultsContainerEl = document.getElementById(
+          "location-results-list"
+        );
+
+        const itemsTemplate = Handlebars.compile(
+          document.getElementById("locator-result-items-tmpl").innerHTML
+        );
+
+        locator.searchLocation = null;
+        locator.searchLocationMarker = null;
+        locator.selectedLocationIdx = null;
+        locator.userCountry = null;
+
+        // Initialize the map -------------------------------------------------------
+        locator.map = new google.maps.Map(mapEl, configuration.mapOptions);
+
+        // Store selection.
+        const selectResultItem = function (
+          locationIdx,
+          panToMarker,
+          scrollToResult
+        ) {
+          locator.selectedLocationIdx = locationIdx;
+          for (let locationElem of resultsContainerEl.children) {
+            locationElem.classList.remove("selected");
+            if (getResultIndex(locationElem) === locator.selectedLocationIdx) {
+              locationElem.classList.add("selected");
+              if (scrollToResult) {
+                panelEl.scrollTop = locationElem.offsetTop;
+              }
+            }
+          }
+          if (panToMarker && locationIdx != null) {
+            locator.map.panTo(locator.locations[locationIdx].coords);
+          }
+        };
+
+        // Create a marker for each location.
+        const markers = locator.locations.map(function (location, index) {
+          const marker = new google.maps.Marker({
+            position: location.coords,
+            map: locator.map,
+            title: location.title,
+          });
+          marker.addListener("click", function () {
+            selectResultItem(index, false, true);
+          });
+          return marker;
+        });
+
+        // Fit map to marker bounds.
+        locator.updateBounds = function () {
+          const bounds = new google.maps.LatLngBounds();
+          if (locator.searchLocationMarker) {
+            bounds.extend(locator.searchLocationMarker.getPosition());
+          }
+          for (let i = 0; i < markers.length; i++) {
+            bounds.extend(markers[i].getPosition());
+          }
+          locator.map.fitBounds(bounds);
+        };
+        if (locator.locations.length) {
+          locator.updateBounds();
+        }
+
+        // Get the distance of a store location to the user's location,
+        // used in sorting the list.
+        const getLocationDistance = function (location) {
+          if (!locator.searchLocation) return null;
+
+          // Use travel distance if available (from Distance Matrix).
+          if (location.travelDistanceValue != null) {
+            return location.travelDistanceValue;
+          }
+
+          // Fall back to straight-line distance.
+          return google.maps.geometry.spherical.computeDistanceBetween(
+            new google.maps.LatLng(location.coords),
+            locator.searchLocation.location
+          );
+        };
+
+        // Render the results list --------------------------------------------------
+
+        // When the results list re-renders, always update directions on the
+        // first selection event.
+        let updateDirectionsOnSelect;
+
+        const getResultIndex = function (elem) {
+          return parseInt(elem.getAttribute("data-location-index"));
+        };
+
+        locator.renderResultsList = function () {
+          let locations = locator.locations.slice();
+          for (let i = 0; i < locations.length; i++) {
+            locations[i].index = i;
+          }
+          if (locator.searchLocation) {
+            sectionNameEl.textContent =
+              "Nearest locations (" + locations.length + ")";
+            locations.sort(function (a, b) {
+              return getLocationDistance(a) - getLocationDistance(b);
+            });
+          } else {
+            sectionNameEl.textContent = `All locations (${locations.length})`;
+          }
+          const resultItemContext = { locations: locations };
+          resultsContainerEl.innerHTML = itemsTemplate(resultItemContext);
+          updateDirectionsOnSelect = true;
+          for (let item of resultsContainerEl.children) {
+            const resultIndex = getResultIndex(item);
+            if (resultIndex === locator.selectedLocationIdx) {
+              item.classList.add("selected");
+            }
+
+            const resultSelectionHandler = function () {
+              if (
+                resultIndex !== locator.selectedLocationIdx ||
+                updateDirectionsOnSelect
+              ) {
+                selectResultItem(resultIndex, true, false);
+                locator.updateDirections();
+                updateDirectionsOnSelect = false;
+              }
+            };
+
+            // Clicking anywhere on the item selects this location.
+            // Additionally, create a button element to make this behavior
+            // accessible under tab navigation.
+            item.addEventListener("click", resultSelectionHandler);
+            item
+              .querySelector(".select-location")
+              .addEventListener("click", function (e) {
+                resultSelectionHandler();
+                e.stopPropagation();
+              });
+
+            item
+              .querySelector(".details-button")
+              .addEventListener("click", function () {
+                locator.showDetails(resultIndex);
+              });
+
+            // For each action that contains links to multiple booking partners,
+            // display the links in a toggleable dropdown menu.
+            item
+              .querySelectorAll(".dropdown-container")
+              .forEach((containerEl) => {
+                const dropdownEl =
+                  containerEl.querySelector(".action-dropdown");
+                const dropdownToggleEl = containerEl.querySelector(
+                  ".action-dropdown-toggle"
+                );
+                dropdownToggleEl.addEventListener("click", function (e) {
+                  // First check if any dropdown menu is open and close it.
+                  if (locator.openDropdownEl) {
+                    hideElement(locator.openDropdownEl);
+                    if (locator.openDropdownEl === dropdownEl) {
+                      locator.openDropdownEl = undefined;
+                      return;
+                    }
+                  }
+                  showElement(dropdownEl);
+                  locator.openDropdownEl = dropdownEl;
+                });
+              });
+
+            // Clicking the directions button will open Google Maps directions in a
+            // new tab
+            const origin =
+              locator.searchLocation != null
+                ? locator.searchLocation.location
+                : "";
+            const destination = locator.locations[resultIndex];
+            const googleMapsUrl = generateDirectionsURL(origin, destination);
+            item
+              .querySelector(".directions-button")
+              .setAttribute("href", googleMapsUrl);
+          }
+        };
+
+        window.addEventListener("click", function (e) {
+          // Collapse any open dropdown menu when user clicks outside it.
+          if (
+            locator.openDropdownEl &&
+            !locator.openDropdownEl.parentNode.contains(e.target)
+          ) {
+            hideElement(locator.openDropdownEl);
+            locator.openDropdownEl = undefined;
+          }
+        });
+
+        // Optional capability initialization --------------------------------------
+        initializeSearchInput(locator);
+        initializeDistanceMatrix(locator);
+        initializeDirections(locator);
+        initializeDetails(locator);
+
+        // Initial render of results -----------------------------------------------
+        locator.renderResultsList();
+      }
+
+      /** When the search input capability is enabled, initialize it. */
+      function initializeSearchInput(locator) {
+        const geocodeCache = new Map();
+        const geocoder = new google.maps.Geocoder();
+
+        const searchInputEl = document.getElementById("location-search-input");
+        const searchButtonEl = document.getElementById(
+          "location-search-button"
+        );
+
+        const updateSearchLocation = function (address, location) {
+          if (locator.searchLocationMarker) {
+            locator.searchLocationMarker.setMap(null);
+          }
+          if (!location) {
+            locator.searchLocation = null;
+            return;
+          }
+          locator.searchLocation = { address: address, location: location };
+          locator.searchLocationMarker = new google.maps.Marker({
+            position: location,
+            map: locator.map,
+            title: "My location",
+            icon: {
+              path: google.maps.SymbolPath.CIRCLE,
+              scale: 12,
+              fillColor: "#3367D6",
+              fillOpacity: 0.5,
+              strokeOpacity: 0,
+            },
+          });
+
+          // Update the locator's idea of the user's country, used for units. Use
+          // `formatted_address` instead of the more structured `address_components`
+          // to avoid an additional billed call.
+          const addressParts = address.split(" ");
+          locator.userCountry = addressParts[addressParts.length - 1];
+
+          // Update map bounds to include the new location marker.
+          locator.updateBounds();
+
+          // Update the result list so we can sort it by proximity.
+          locator.renderResultsList();
+
+          locator.updateTravelTimes();
+
+          locator.clearDirections();
+        };
+
+        const geocodeSearch = function (query) {
+          if (!query) {
+            return;
+          }
+
+          const handleResult = function (geocodeResult) {
+            searchInputEl.value = geocodeResult.formatted_address;
+            updateSearchLocation(
+              geocodeResult.formatted_address,
+              geocodeResult.geometry.location
+            );
+          };
+
+          if (geocodeCache.has(query)) {
+            handleResult(geocodeCache.get(query));
+            return;
+          }
+          const request = { address: query, bounds: locator.map.getBounds() };
+          geocoder.geocode(request, function (results, status) {
+            if (status === "OK") {
+              if (results.length > 0) {
+                const result = results[0];
+                geocodeCache.set(query, result);
+                handleResult(result);
+              }
+            }
+          });
+        };
+
+        // Set up geocoding on the search input.
+        searchButtonEl.addEventListener("click", function () {
+          geocodeSearch(searchInputEl.value.trim());
+        });
+
+        // Initialize Autocomplete.
+        initializeSearchInputAutocomplete(
+          locator,
+          searchInputEl,
+          geocodeSearch,
+          updateSearchLocation
+        );
+      }
+
+      /** Add Autocomplete to the search input. */
+      function initializeSearchInputAutocomplete(
+        locator,
+        searchInputEl,
+        fallbackSearch,
+        searchLocationUpdater
+      ) {
+        // Set up Autocomplete on the search input. Bias results to map viewport.
+        const autocomplete = new google.maps.places.Autocomplete(
+          searchInputEl,
+          {
+            types: ["geocode"],
+            fields: ["place_id", "formatted_address", "geometry.location"],
+          }
+        );
+        autocomplete.bindTo("bounds", locator.map);
+        autocomplete.addListener("place_changed", function () {
+          const placeResult = autocomplete.getPlace();
+          if (!placeResult.geometry) {
+            // Hitting 'Enter' without selecting a suggestion will result in a
+            // placeResult with only the text input value as the 'name' field.
+            fallbackSearch(placeResult.name);
+            return;
+          }
+          searchLocationUpdater(
+            placeResult.formatted_address,
+            placeResult.geometry.location
+          );
+        });
+      }
+
+      /** Initialize Distance Matrix for the locator. */
+      function initializeDistanceMatrix(locator) {
+        const distanceMatrixService = new google.maps.DistanceMatrixService();
+
+        // Annotate travel times to the selected location using Distance Matrix.
+        locator.updateTravelTimes = function () {
+          if (!locator.searchLocation) return;
+
+          const units =
+            locator.userCountry === "USA"
+              ? google.maps.UnitSystem.IMPERIAL
+              : google.maps.UnitSystem.METRIC;
+          const request = {
+            origins: [locator.searchLocation.location],
+            destinations: locator.locations.map(function (x) {
+              return x.coords;
+            }),
+            travelMode: google.maps.TravelMode.DRIVING,
+            unitSystem: units,
+          };
+          const callback = function (response, status) {
+            if (status === "OK") {
+              const distances = response.rows[0].elements;
+              for (let i = 0; i < distances.length; i++) {
+                const distResult = distances[i];
+                let travelDistanceText, travelDistanceValue;
+                if (distResult.status === "OK") {
+                  travelDistanceText = distResult.distance.text;
+                  travelDistanceValue = distResult.distance.value;
+                }
+                const location = locator.locations[i];
+                location.travelDistanceText = travelDistanceText;
+                location.travelDistanceValue = travelDistanceValue;
+              }
+
+              // Re-render the results list, in case the ordering has changed.
+              locator.renderResultsList();
+            }
+          };
+          distanceMatrixService.getDistanceMatrix(request, callback);
+        };
+      }
+
+      /** Initialize Directions service for the locator. */
+      function initializeDirections(locator) {
+        const directionsCache = new Map();
+        const directionsService = new google.maps.DirectionsService();
+        const directionsRenderer = new google.maps.DirectionsRenderer({
+          suppressMarkers: true,
+        });
+
+        // Update directions displayed from the search location to
+        // the selected location on the map.
+        locator.updateDirections = function () {
+          if (!locator.searchLocation || locator.selectedLocationIdx == null) {
+            return;
+          }
+          const cacheKey = JSON.stringify([
+            locator.searchLocation.location,
+            locator.selectedLocationIdx,
+          ]);
+          if (directionsCache.has(cacheKey)) {
+            const directions = directionsCache.get(cacheKey);
+            directionsRenderer.setMap(locator.map);
+            directionsRenderer.setDirections(directions);
+            return;
+          }
+          const request = {
+            origin: locator.searchLocation.location,
+            destination: locator.locations[locator.selectedLocationIdx].coords,
+            travelMode: google.maps.TravelMode.DRIVING,
+          };
+          directionsService.route(request, function (response, status) {
+            if (status === "OK") {
+              directionsRenderer.setMap(locator.map);
+              directionsRenderer.setDirections(response);
+              directionsCache.set(cacheKey, response);
+            }
+          });
+        };
+
+        locator.clearDirections = function () {
+          directionsRenderer.setMap(null);
+        };
+      }
+
+      /** Initialize Place Details service and UI for the locator. */
+      function initializeDetails(locator) {
+        const panelDetailsEl = document.getElementById(
+          "locations-panel-details"
+        );
+        const detailsService = new google.maps.places.PlacesService(
+          locator.map
+        );
+
+        const detailsTemplate = Handlebars.compile(
+          document.getElementById("locator-details-tmpl").innerHTML
+        );
+
+        const renderDetails = function (context) {
+          panelDetailsEl.innerHTML = detailsTemplate(context);
+          panelDetailsEl
+            .querySelector(".back-button")
+            .addEventListener("click", hideDetails);
+        };
+
+        const hideDetails = function () {
+          showElement(locator.panelListEl);
+          hideElement(panelDetailsEl);
+        };
+
+        locator.showDetails = function (locationIndex) {
+          const location = locator.locations[locationIndex];
+          const context = { location };
+
+          // Helper function to create a fixed-size array.
+          const initArray = function (arraySize) {
+            const array = [];
+            while (array.length < arraySize) {
+              array.push(0);
+            }
+            return array;
+          };
+
+          if (location.placeId) {
+            const request = {
+              placeId: location.placeId,
+              fields: [
+                "formatted_phone_number",
+                "website",
+                "opening_hours",
+                "url",
+                "utc_offset_minutes",
+                "price_level",
+                "rating",
+                "user_ratings_total",
+              ],
+            };
+            detailsService.getDetails(request, function (place, status) {
+              if (status == google.maps.places.PlacesServiceStatus.OK) {
+                if (place.opening_hours) {
+                  const daysHours = place.opening_hours.weekday_text
+                    .map((e) => e.split(/\:\s+/))
+                    .map((e) => ({ days: e[0].substr(0, 3), hours: e[1] }));
+
+                  for (let i = 1; i < daysHours.length; i++) {
+                    if (daysHours[i - 1].hours === daysHours[i].hours) {
+                      if (daysHours[i - 1].days.indexOf("-") !== -1) {
+                        daysHours[i - 1].days = daysHours[i - 1].days.replace(
+                          /\w+$/,
+                          daysHours[i].days
+                        );
+                      } else {
+                        daysHours[i - 1].days += " - " + daysHours[i].days;
+                      }
+                      daysHours.splice(i--, 1);
+                    }
+                  }
+                  place.openingHoursSummary = daysHours;
+                }
+                if (place.rating) {
+                  const starsOutOfTen = Math.round(2 * place.rating);
+                  const fullStars = Math.floor(starsOutOfTen / 2);
+                  const halfStars = fullStars !== starsOutOfTen / 2 ? 1 : 0;
+                  const emptyStars = 5 - fullStars - halfStars;
+
+                  // Express stars as arrays to make iterating in Handlebars easy.
+                  place.fullStarIcons = initArray(fullStars);
+                  place.halfStarIcons = initArray(halfStars);
+                  place.emptyStarIcons = initArray(emptyStars);
+                }
+                if (place.price_level) {
+                  place.dollarSigns = initArray(place.price_level);
+                }
+                if (place.website) {
+                  const url = new URL(place.website);
+                  place.websiteDomain = url.hostname;
+                }
+
+                context.place = place;
+                renderDetails(context);
+              }
+            });
+          }
+          renderDetails(context);
+          hideElement(locator.panelListEl);
+          showElement(panelDetailsEl);
+        };
+      }
+    </script>
+    <script>
+      const CONFIGURATION = {
+        locations: [
+          {
+            title: "Hawke Prohibition Distilleries.",
+            address1: "426 Kaska Road",
+            address2: "Sherwood Park, AB, Canada",
+            coords: { lat: 53.5397775, lng: -113.3308932 },
+            placeId: "ChIJy0jPlB8WoFMR0xCbYSBMJbw",
+          },
+          {
+            title: "121 JASPER LIQUOR",
+            address1: "12110 Jasper Ave",
+            address2: "Edmonton, AB T5N 3J8, Canada",
+            coords: { lat: 53.54122726979031, lng: -113.53125744662704 },
+            placeId: "ChIJpZ6_5CsioFMR4r-RYydnHpA",
+          },
+          {
+            title: "97 Street Liquor Store",
+            address1: "12965 97 St NW",
+            address2: "Edmonton, AB T5E 4C4, Canada",
+            coords: { lat: 53.58944744489437, lng: -113.49138621779097 },
+            placeId: "ChIJ3V0PdnAjoFMRrSamQz_bkxA",
+            actions: [
+              {
+                label: "Order online",
+                defaultUrl:
+                  "https://food.google.com/chooseprovider?restaurantId\u003d/g/1tgxhrd3",
+              },
+            ],
+          },
+          {
+            title: "A.D. Liquor Mart",
+            address1: "11836 Wayne Gretzky Drive Northwest",
+            address2: "Edmonton, AB T5B 4L3, Canada",
+            coords: { lat: 53.571605083191976, lng: -113.45256506134224 },
+            placeId: "ChIJbaqHYiIjoFMRF4jbdSsCBVY",
+          },
+          {
+            title: "Aligra",
+            address1: "8882 170 St NW #1423",
+            address2: "Edmonton, AB T5T 4M2, Canada",
+            coords: { lat: 53.52306543963239, lng: -113.62832491779099 },
+            placeId: "ChIJbWmP3F4goFMR9Eqye18MJ1M",
+          },
+          {
+            title: "9709 90 St",
+            address1: "9709 90 St",
+            address2: "Fort Saskatchewan, AB T8L 1K5, Canada",
+            coords: { lat: 53.69857567729397, lng: -113.22926467055225 },
+            placeId: "ChIJfW6fKIA4oFMRGjPxZeifsDE",
+          },
+          {
+            title: "Apollo Liquor Devon",
+            address1: "17 Athabasca Ave #102B",
+            address2: "Devon, AB T9G 1G5, Canada",
+            coords: { lat: 53.36486886523067, lng: -113.73052517055224 },
+            placeId: "ChIJudLqMbnxn1MRdeEqBXlNGCc",
+          },
+          {
+            title: "Arena Liquor",
+            address1: "10266 103 St NW Unit 394",
+            address2: "Edmonton, AB T5J 0Y8, Canada",
+            coords: { lat: 53.54448925155062, lng: -113.49808265889551 },
+            placeId: "ChIJfwXnczGjY0ERMRwj4ePOmAs",
+          },
+          {
+            title: "Aspen Liquor Store",
+            address1: "4320 50 St",
+            address2: "Drayton Valley, AB T7A 1M4, Canada",
+            coords: { lat: 53.21581138490045, lng: -114.97762854662705 },
+            placeId: "ChIJIwJ-9ghHnlMR9xhMSfo4SLU",
+          },
+          {
+            title: "B \u0026 B Liquor Store",
+            address1: "5036 50 Ave",
+            address2: "Drayton Valley, AB T7A 1R6, Canada",
+            coords: { lat: 53.22171532455829, lng: -114.97868268220901 },
+            placeId: "ChIJhwBzvaVHnlMRYaeBiDWwIT0",
+          },
+          {
+            title: "Bellerose Liquor Store",
+            address1: "11 Bellerose Dr",
+            address2: "St. Albert, AB T8N 5C9, Canada",
+            coords: { lat: 53.645783669397545, lng: -113.62470958711987 },
+            placeId: "ChIJB_btwOYloFMRjmDkqgmBivE",
+          },
+          {
+            title: "Belvedere Golf and Country Club",
+            address1: "51418 AB-21",
+            address2: "Sherwood Park, AB T8B 1K9, Canada",
+            coords: { lat: 53.428129536974005, lng: -113.25360008220902 },
+            placeId: "ChIJdcgH64wQoFMRpKt-trssHrU",
+          },
+          {
+            title: "Boss Liquor West",
+            address1: "10917 156 St NW",
+            address2: "Edmonton, AB T5P 2S7, Canada",
+            coords: { lat: 53.554766917004926, lng: -113.58996924480935 },
+            placeId: "ChIJ5bUv9pIhoFMRWoFd31R_1YM",
+          },
+          {
+            title: "BT Liquor",
+            address1: "88 Howarth St #5",
+            address2: "Red Deer, AB T4N 6V9, Canada",
+            coords: { lat: 52.282214130827164, lng: -113.83655067055226 },
+            placeId: "ChIJfwstJO5VdFMR7UJeBAsPajM",
+          },
+          {
+            title: "Burnt Lake Liquor Store",
+            address1: "102",
+            address2: "Burnt Lake Trail, Red Deer, AB T4S 2L4, Canada",
+            coords: { lat: 52.28588619737883, lng: -113.87217920552253 },
+            placeId: "ChIJKW6wk3tUdFMRBjVNDsH2Y0g",
+          },
+          {
+            title: "5709 48 Ave",
+            address1: "5709 48 Ave",
+            address2: "Camrose, AB T4V 0J9, Canada",
+            coords: { lat: 53.01768591931846, lng: -112.83969112944774 },
+            placeId: "ChIJ_Xxm3c27ClMRIXyUhA30mdo",
+          },
+          {
+            title: "Callingwood Liquor Ltd.",
+            address1: "6002 184 St NW",
+            address2: "Edmonton, AB T6M 1X7, Canada",
+            coords: { lat: 53.49449465989517, lng: -113.64052618220902 },
+            placeId: "ChIJgSD-4rshoFMRjW2Q26mAK20",
+          },
+          {
+            title: "Campbell Liquor Store",
+            address1: "3 Curial Dr",
+            address2: "St. Albert, AB T8N 6P6, Canada",
+            coords: { lat: 53.6353546180648, lng: -113.57532168220901 },
+            placeId: "ChIJow4Ee7EloFMRWyi6ukZ9MiE",
+          },
+          {
+            title: "13704 Castle Downs Rd NW",
+            address1: "13704 Castle Downs Rd NW",
+            address2: "Edmonton, AB T5X 4H7, Canada",
+            coords: { lat: 53.60013689244518, lng: -113.51763538220901 },
+            placeId: "ChIJH2U9p4AkoFMRuwpd-Ekl6Zc",
+          },
+          {
+            title: "6201 46 Ave",
+            address1: "6201 46 Ave",
+            address2: "Red Deer, AB T4N 6Z1, Canada",
+            coords: { lat: 52.28619895616461, lng: -113.80150235276128 },
+            placeId: "ChIJMTJOCrZVdFMRiUHVWKVVT9E",
+          },
+          {
+            title: "Central Social Hall",
+            address1: "10909 Jasper Ave",
+            address2: "Edmonton, AB T5J 3L9, Canada",
+            coords: { lat: 53.54069708771884, lng: -113.50904838220902 },
+            placeId: "ChIJkVG1XDcioFMRiOZRd2XHnP8",
+            actions: [
+              {
+                label: "Order online",
+                defaultUrl:
+                  "https://food.google.com/chooseprovider?restaurantId\u003d/g/1hhxm11dm",
+              },
+              {
+                label: "Reserve a table",
+                defaultUrl:
+                  "https://www.opentable.ca/restaurant/profile/327652?ref\u003d16423",
+              },
+            ],
+          },
+          {
+            title: "Central Social Hall",
+            address1: "525 St Albert Trail #280",
+            address2: "St. Albert, AB T8N 4J8, Canada",
+            coords: { lat: 53.65086860192073, lng: -113.62726504110451 },
+            placeId: "ChIJ6S-OceQloFMR1gKdZa4pk7s",
+            actions: [
+              {
+                label: "Order online",
+                defaultUrl:
+                  "https://food.google.com/chooseprovider?restaurantId\u003d/g/11b7m98wg3",
+              },
+              {
+                label: "Reserve a table",
+                defaultUrl:
+                  "https://www.opentable.ca/restaurant/profile/1076842?ref\u003d16423",
+              },
+            ],
+          },
+          {
+            title: "Central Social Hall",
+            address1: "10010 12 Ave SW",
+            address2: "Edmonton, AB T6X 0P9, Canada",
+            coords: { lat: 53.42422738523966, lng: -113.48786387055226 },
+            placeId: "ChIJT0NLi7gfoFMRLDxYoeDiqcM",
+          },
+          {
+            title: "Chateau Louis Liquor Store",
+            address1: "11450 117 St NW",
+            address2: "Edmonton, AB T5G 3E8, Canada",
+            coords: { lat: 53.5659430726335, lng: -113.5221434411045 },
+            placeId: "ChIJU6_BLEwjoFMR6EWhdLluPkw",
+          },
+          {
+            title: "CJ\u0027s Liquor Unlimited",
+            address1: "3823 Caxton St",
+            address2: "Whitecourt, AB T7S 1P3, Canada",
+            coords: { lat: 54.12618346084842, lng: -115.66476767055225 },
+            placeId: "ChIJu6MIMFzTnlMRt_Al_sBcijo",
+          },
+          {
+            title: "Clareview Liquor",
+            address1: "13750 50 St NW #8",
+            address2: "Edmonton, AB T5A 5J6, Canada",
+            coords: { lat: 53.598471218743796, lng: -113.41443092270183 },
+            placeId: "ChIJDwo7V-U9oFMRAWKOowMR7BE",
+          },
+          {
+            title: "Leduc Co-op Liquor",
+            address1: "100B Deer Valley Dr #103",
+            address2: "Leduc, AB T9E 0S3, Canada",
+            coords: { lat: 53.266031014266495, lng: -113.59271481716196 },
+            placeId: "ChIJ9VLz6Cn6n1MR2ylYqkeap44",
+          },
+          {
+            title: "Co-op Liquor",
+            address1: "10402 67th Ave",
+            address2: "Grande Prairie, AB T8W 0K8, Canada",
+            coords: { lat: 55.14100488505009, lng: -118.8091221588955 },
+            placeId: "ChIJv4N2rh2RkFMR_62-OL7jKNY",
+          },
+          {
+            title: "Co-op Liquor",
+            address1: "13204 102 St",
+            address2: "Grande Prairie, AB T8V 1X9, Canada",
+            coords: { lat: 55.20076399156504, lng: -118.80178974110451 },
+            placeId: "ChIJq_Mn0USVkFMRegIfpS3X3GI",
+          },
+          {
+            title: "Country Garden Liquor Store",
+            address1: "3911 48 Ave",
+            address2: "Camrose, AB T4V 2Z1, Canada",
+            coords: { lat: 53.017440389293625, lng: -112.80697953065378 },
+            placeId: "ChIJ4zRsJee7ClMRUPVpOtmBBDc",
+          },
+          {
+            title: "221 Chippewa Rd",
+            address1: "221 Chippewa Rd",
+            address2: "Sherwood Park, AB T8A 4E6, Canada",
+            coords: { lat: 53.53779611930402, lng: -113.32394506934624 },
+            placeId: "ChIJM5kDLNEXoFMRqixdczGfV2Q",
+          },
+          {
+            title: "Crossroads Liquor",
+            address1: "975 Broadmoor Blvd #46",
+            address2: "Sherwood Park, AB T8A 5W9, Canada",
+            coords: { lat: 53.540104075172806, lng: -113.32088370552253 },
+            placeId: "ChIJMWCqnNYXoFMRNagtom63Rb8",
+          },
+          {
+            title: "Crown Liquor Store",
+            address1: "9537 76 Ave NW",
+            address2: "Edmonton, AB T6C 0K1, Canada",
+            coords: { lat: 53.51213988275157, lng: -113.47582878220904 },
+            placeId: "ChIJTxE3AKAYoFMRPt1onGhbMe0",
+          },
+          {
+            title: "Dales Liquor Store",
+            address1: "4809 51 Ave",
+            address2: "Camrose, AB T4V 0V4, Canada",
+            coords: { lat: 53.02347066050922, lng: -112.8221654411045 },
+            placeId: "ChIJy01QusO7ClMRJOerRubS4Nk",
+          },
+          {
+            title: "Delton Liquor Mart",
+            address1: "8103 127 Ave NW",
+            address2: "Edmonton, AB T5C 1R9, Canada",
+            coords: { lat: 53.58422452439592, lng: -113.46579057055227 },
+            placeId: "ChIJl3aeIUAjoFMRNfDM_FIyXe0",
+          },
+          {
+            title: "Easy Liquor Capilano",
+            address1: "4938 98 Ave NW",
+            address2: "Edmonton, AB T6B 2Y7, Canada",
+            coords: { lat: 53.53829200150058, lng: -113.41568468220902 },
+            placeId: "ChIJ4VzxkIkjoFMRq6AsHWSUZVs",
+          },
+          {
+            title: "ECONO LIQUOR",
+            address1: "4313 167 Ave NW",
+            address2: "Edmonton, AB T5Y 3Y2, Canada",
+            coords: { lat: 53.628165762567725, lng: -113.40635665889549 },
+            placeId: "ChIJW_Wg5m07oFMRde-Mkp5oCm4",
+          },
+          {
+            title: "Econo Liquor",
+            address1: "112 Town Crest Rd",
+            address2: "Fort Saskatchewan, AB T8L 0G7, Canada",
+            coords: { lat: 53.68159128241525, lng: -113.24186973865775 },
+            placeId: "ChIJSyDMTZE4oFMRby_Dub35PDA",
+          },
+          {
+            title: "Edge Liquor",
+            address1: "4101 49 Ave",
+            address2: "Stony Plain, AB T7Z 2J7, Canada",
+            coords: { lat: 53.53254509478572, lng: -113.9900620411045 },
+            placeId: "ChIJgVy299WRn1MRkFENcR_m2xs",
+          },
+          {
+            title: "Everything Wine And More",
+            address1: "100 Broadview Dr #25",
+            address2: "Sherwood Park, AB T8H 0T5, Canada",
+            coords: { lat: 53.54334679462045, lng: -113.31571760552255 },
+            placeId: "ChIJ4cDrlCoWoFMRSMaxpJrLm-A",
+          },
+          {
+            title: "Evolution Liquor Store",
+            address1: "9216 51 Ave NW",
+            address2: "Edmonton, AB T6E 5L8, Canada",
+            coords: { lat: 53.488541790532295, lng: -113.4697263411045 },
+            placeId: "ChIJazvnrMcYoFMRnmvTDxUK728",
+          },
+          {
+            title: "Garside - Evolution Liquor Inc.",
+            address1: "15523 118 Ave NW",
+            address2: "Edmonton, AB T5V 1C5, Canada",
+            coords: { lat: 53.569735405838955, lng: -113.58954292331352 },
+            placeId: "ChIJq6panU8hoFMRS1ZFpa7qGa4",
+          },
+          {
+            title: "G\u0026R Liquor Mart",
+            address1: "9906 109 St NW",
+            address2: "Edmonton, AB T5K 1H5, Canada",
+            coords: { lat: 53.53751518469242, lng: -113.50868271165675 },
+            placeId: "ChIJcxdLKToioFMRJ4Sni6ht3gM",
+          },
+          {
+            title: "Gentlemen\u0027s Liquor Store",
+            address1: "4810 50 Ave",
+            address2: "Wetaskiwin, AB T9A 0S2, Canada",
+            coords: { lat: 52.96941242785532, lng: -113.37116547055224 },
+            placeId: "ChIJ8yosWzlOdVMRFJvHzfx0bio",
+          },
+          {
+            title: "Glassy Liquor",
+            address1: "3377 28 Ave SW",
+            address2: "Edmonton, AB T6X 1A5, Canada",
+            coords: { lat: 53.40723342665906, lng: -113.39353052331352 },
+            placeId: "ChIJOV34D5EboFMRg7YGrUfVzrM",
+          },
+          {
+            title: "GREAT LIQUOR Nisku",
+            address1: "205 19 Ave #1",
+            address2: "Nisku, AB T9E 0W8, Canada",
+            coords: { lat: 53.33476283477657, lng: -113.54141035274391 },
+            placeId: "ChIJ4a1Cz5T3n1MR8bC9caDiris",
+          },
+          {
+            title: "GREAT LIQUOR",
+            address1: "99 Wye Rd #17",
+            address2: "Sherwood Park, AB T8B 1M1, Canada",
+            coords: { lat: 53.51119935516584, lng: -113.33179274110451 },
+            placeId: "ChIJi54bDSAXoFMR0dyJnt5E6bY",
+          },
+          {
+            title: "Harley\u0027s Liquor Store",
+            address1: "6520 48 Ave",
+            address2: "Camrose, AB T4V 3A3, Canada",
+            coords: { lat: 53.01859320185535, lng: -112.85383064110451 },
+            placeId: "ChIJiQuTkjO6ClMRbEiwh6Yg9QE",
+          },
+          {
+            title: "Hi End Liquor - Walker",
+            address1: "5025 22 Ave SW",
+            address2: "Edmonton, AB T6X 2N4, Canada",
+            coords: { lat: 53.41375230249155, lng: -113.41935071165676 },
+            placeId: "ChIJKWI00ZAboFMR_SXugoVkzlo",
+          },
+          {
+            title: "Hidden Gems Tavern",
+            address1: "4912 50 St",
+            address2: "Egremont, AB T0A 0Z0, Canada",
+            coords: { lat: 54.037740375643885, lng: -113.12536011165676 },
+            placeId: "ChIJWdlbQKlvpFMRVHXKzox0rrA",
+          },
+          {
+            title: "Hi End Liquor - Desrochers",
+            address1: "815 Daniels Way SW",
+            address2: "Edmonton, AB T6W 4T7, Canada",
+            coords: { lat: 53.399033289183365, lng: -113.54211402331352 },
+            placeId: "ChIJZ6wTQVQdoFMRqi4fbX70rwo",
+          },
+          {
+            title: "J\u0027s Prime Liquor",
+            address1: "3235 50 Ave B",
+            address2: "Red Deer, AB T4N 3Y1, Canada",
+            coords: { lat: 52.25169682267688, lng: -113.81301668834323 },
+            placeId: "ChIJ7Y31OaRXdFMRxpOVXRrmRT8",
+            actions: [
+              {
+                label: "Order online",
+                defaultUrl:
+                  "https://food.google.com/chooseprovider?restaurantId\u003d/g/11r4m7glmp",
+              },
+            ],
+          },
+          {
+            title: "J \u0026 K Liquor Stop",
+            address1: "51073 Service Rd",
+            address2: "Sherwood Park, AB T8B 1K5, Canada",
+            coords: { lat: 53.38055327499672, lng: -113.24457649386578 },
+            placeId: "ChIJm5DJvCoRoFMRY4-26JVbRvI",
+          },
+          {
+            title: "Lacombe Park Spirits",
+            address1: "506 St Albert Trail #202",
+            address2: "St. Albert, AB T8N 5Z1, Canada",
+            coords: { lat: 53.648543671435895, lng: -113.62935422331351 },
+            placeId: "ChIJ0c8O8dUloFMRxji5tqwoctI",
+          },
+          {
+            title: "Liquor4U",
+            address1: "619 Cameron Heights Dr NW",
+            address2: "Edmonton, AB T6M 0L9, Canada",
+            coords: { lat: 53.47012620955865, lng: -113.63146785889549 },
+            placeId: "ChIJKwRsN3z1n1MR0TuW-Y_C1l0",
+          },
+          {
+            title: "Liquor by Mehbs",
+            address1: "South Park",
+            address2: "Leduc, AB T9E 4R1, Canada",
+            coords: { lat: 53.257634142400995, lng: -113.54044761165676 },
+            placeId: "ChIJ9UmtYRL5n1MRrw6HEzBDPXM",
+          },
+          {
+            title: "Liquor Choice",
+            address1: "5028 50 St",
+            address2: "Mundare, AB T0B 3H0, Canada",
+            coords: { lat: 53.59326463189597, lng: -112.34024334110451 },
+            placeId: "ChIJbe2G0AiPoFMRg6KhqLzQ2sM",
+          },
+          {
+            title: "Liquor Den",
+            address1: "5230 50 Ave",
+            address2: "Vegreville, AB T9C 1M4, Canada",
+            coords: { lat: 53.49769435716988, lng: -112.05938757423972 },
+            placeId: "ChIJd3ItUEKcoFMRR2qOjgI_l1E",
+          },
+          {
+            title: "Liquor Exchange",
+            address1: "3840 Sherwood Dr #410",
+            address2: "Sherwood Park, AB T8H 0Z9, Canada",
+            coords: { lat: 53.55522578299701, lng: -113.29328217055226 },
+            placeId: "ChIJHRpvl4M9oFMRyobPYowfiO4",
+          },
+          {
+            title: "G P Liquor For Less Ltd",
+            address1: "10001 97 Ave Unit 103",
+            address2: "Grande Prairie, AB T8V 0N3, Canada",
+            coords: { lat: 55.167670623517594, lng: -118.79530242331352 },
+            placeId: "ChIJA9R8lEmRkFMRovSk1pOi7Qw",
+          },
+          {
+            title: "Liquor Fort",
+            address1: "12251 Fort Rd NW",
+            address2: "Edmonton, AB T5B 4H2, Canada",
+            coords: { lat: 53.57838823860154, lng: -113.45671967055226 },
+            placeId: "ChIJUWHQxD0joFMRy_Q1z-o5oWQ",
+          },
+          {
+            title: "Liquor Gallery",
+            address1: "13030 50 St NW",
+            address2: "Edmonton, AB T5A 4V9, Canada",
+            coords: { lat: 53.591577833358734, lng: -113.41785907055227 },
+            placeId: "ChIJyb_FaMg8oFMRzvqXBjZNCas",
+          },
+          {
+            title: "Liquor House",
+            address1: "15255 111 Ave NW",
+            address2: "Edmonton, AB T5M 2R1, Canada",
+            coords: { lat: 53.558528074967846, lng: -113.58392822147846 },
+            placeId: "ChIJuYWa_2khoFMRdsuiYOaPuNs",
+            actions: [
+              {
+                label: "Order online",
+                defaultUrl:
+                  "https://food.google.com/chooseprovider?restaurantId\u003d/g/11nnv_2vc0",
+              },
+            ],
+          },
+          {
+            title: "Liquor House - 11730 Jasper Ave",
+            address1: "11730 Jasper Ave",
+            address2: "Edmonton, AB T5K 0N3, Canada",
+            coords: { lat: 53.54159790000001, lng: -113.52408628220901 },
+            placeId: "ChIJK1TZI-UjoFMRNiGi9JzGPFs",
+          },
+          {
+            title: "Liquor House - Fort Saskatchewan",
+            address1: "130 Westpark Blvd",
+            address2: "Fort Saskatchewan, AB T8L 0B2, Canada",
+            coords: { lat: 53.68145989497928, lng: -113.24867625889549 },
+            placeId: "ChIJM-iUS0E5oFMRadodkwZBEh8",
+          },
+          {
+            title: "Liquor House - 11314 Jasper Ave",
+            address1: "11314 Jasper Ave",
+            address2: "Edmonton, AB T5K 0L8, Canada",
+            coords: { lat: 53.541281276606846, lng: -113.51636501165676 },
+            placeId: "ChIJJWndVDAioFMREhHfbg-JSmk",
+          },
+          {
+            title: "Liquor House - Southridge",
+            address1: "111-120 Southridge Blvd",
+            address2: "Fort Saskatchewan, AB T8L 0P6, Canada",
+            coords: { lat: 53.67481229521661, lng: -113.24298365276127 },
+            placeId: "ChIJF4xIbqA5oFMRZXPX7mAJ6u0",
+            actions: [
+              {
+                label: "Order online",
+                defaultUrl:
+                  "https://food.google.com/chooseprovider?restaurantId\u003d/g/11p3dvl56j",
+              },
+            ],
+          },
+          {
+            title: "Liquor Hut Tamarack",
+            address1: "2427 Maple Rd NW",
+            address2: "Edmonton, AB T6T 0Y3, Canada",
+            coords: { lat: 53.47784311973995, lng: -113.3663642411045 },
+            placeId: "ChIJr7Lb-OEZoFMR9KmmaDgXKm4",
+            actions: [
+              {
+                label: "Order online",
+                defaultUrl:
+                  "https://food.google.com/chooseprovider?restaurantId\u003d/g/11r50l5lx4",
+              },
+            ],
+          },
+          {
+            title: "Liquor Hut Edmonton",
+            address1: "20922 62 Ave NW",
+            address2: "Edmonton, AB T5T 4L7, Canada",
+            coords: { lat: 53.49805735232618, lng: -113.68207211165677 },
+            placeId: "ChIJvzVBjgkfoFMRLQosi5xv_X4",
+            actions: [
+              {
+                label: "Order online",
+                defaultUrl:
+                  "https://food.google.com/chooseprovider?restaurantId\u003d/g/11lgqm7p7z",
+              },
+            ],
+          },
+          {
+            title: "Liquor Island",
+            address1: "Hamptons Terrace",
+            address2: "20122 Lessard Rd NW, Edmonton, AB T6M 0V5, Canada",
+            coords: { lat: 53.47835668980388, lng: -113.67362947055224 },
+            placeId: "ChIJB7HD6aKLn1MRsf88JMg1MaU",
+          },
+          {
+            title: "Liquor Island",
+            address1: "9772 182 St NW",
+            address2: "Edmonton, AB T5T 3T9, Canada",
+            coords: { lat: 53.533398831010985, lng: -113.63893412331352 },
+            placeId: "ChIJSQOwGl8hoFMR_--PzMt1lzw",
+          },
+          {
+            title: "Liquor King",
+            address1: "209 Calahoo Rd",
+            address2: "Spruce Grove, AB T7X 1R1, Canada",
+            coords: { lat: 53.54292087274743, lng: -113.91070601165676 },
+            placeId: "ChIJ3fm_SfGOn1MR72aOduv9te0",
+          },
+          {
+            title: "Liquor Merchants",
+            address1: "11148 82 Ave NW",
+            address2: "Edmonton, AB T6G 2L8, Canada",
+            coords: { lat: 53.51828469533959, lng: -113.51964517055227 },
+            placeId: "ChIJiURBL_YhoFMRAlRW2UCcHcY",
+          },
+          {
+            title: "Liquor Merchants",
+            address1: "13132 82 St NW",
+            address2: "Edmonton, AB T5E 2T5, Canada",
+            coords: { lat: 53.591974206519616, lng: -113.46804538713724 },
+            placeId: "ChIJd4ZPG0MjoFMR1XVXRS2PPe8",
+          },
+          {
+            title: "Liquor Nation",
+            address1: "2016 Sherwood Dr",
+            address2: "Edmonton, AB T8A 3X3, Canada",
+            coords: { lat: 53.52755112806138, lng: -113.29423101165676 },
+            placeId: "ChIJU1tAizUWoFMR1WnAj5hhfOI",
+          },
+          {
+            title: "Liquor Store On 111th",
+            address1: "9611 111 Ave NW",
+            address2: "Edmonton, AB T5G 0A9, Canada",
+            coords: { lat: 53.559009650431804, lng: -113.48995288834323 },
+            placeId: "ChIJwXsSdqwjoFMRNXEkSiRk-3c",
+          },
+          {
+            title: "Liquor Planet",
+            address1: "9925 100 St",
+            address2: "Morinville, AB T8R 1R4, Canada",
+            coords: { lat: 53.80131458827686, lng: -113.64472445461368 },
+            placeId: "ChIJUbUZ1XktoFMRB6s_RjaGJ7c",
+          },
+          {
+            title: "Liquor Run Ltd",
+            address1: "15636 Stony Plain Rd",
+            address2: "Edmonton, AB T5P 3Z4, Canada",
+            coords: { lat: 53.541543652870985, lng: -113.59145561165676 },
+            placeId: "ChIJubw93g4hoFMRxt3GjqAOiYY",
+          },
+          {
+            title: "Liquor Station",
+            address1: "16220 Stony Plain Rd",
+            address2: "Edmonton, AB T5P 4A4, Canada",
+            coords: { lat: 53.541684395009234, lng: -113.6021599411045 },
+            placeId: "ChIJ-RuV4wQhoFMRKR-SZ--vbC4",
+          },
+          {
+            title: "Liquor Studio",
+            address1: "15255 111 Ave NW",
+            address2: "Edmonton, AB T5M 2R1, Canada",
+            coords: { lat: 53.55853123392666, lng: -113.58392964110452 },
+            placeId: "ChIJJdNAAEIhoFMRjt3RTRI5tIM",
+          },
+          {
+            title: "Liquor Today",
+            address1: "16618 109 Ave NW",
+            address2: "Edmonton, AB T5P 1C2, Canada",
+            coords: { lat: 53.55636923222044, lng: -113.60651188834323 },
+            placeId: "ChIJXVSCBj0hoFMR_16Pvf-EwgM",
+          },
+          {
+            title: "Liquor Vault",
+            address1: "101 Granada Blvd #202",
+            address2: "Sherwood Park, AB T8A 4W2, Canada",
+            coords: { lat: 53.52904011244803, lng: -113.29005267055226 },
+            placeId: "ChIJwbZY95AXoFMRgH5EaODPQ1c",
+            actions: [
+              {
+                label: "Order online",
+                defaultUrl:
+                  "https://food.google.com/chooseprovider?restaurantId\u003d/g/11h5md33y9",
+              },
+            ],
+          },
+          {
+            title: "Liquor Warehouse",
+            address1: "4802 43 Ave #3",
+            address2: "Cold Lake, AB T9M 1K6, Canada",
+            coords: { lat: 54.40742658780192, lng: -110.2033009588955 },
+            placeId: "ChIJEaCrfInJp1MRNeQdn_eMEdI",
+          },
+          {
+            title: "Liquor XS",
+            address1: "4234 66 St NW",
+            address2: "Edmonton, AB T6K 4A2, Canada",
+            coords: { lat: 53.48142367812216, lng: -113.44427902944773 },
+            placeId: "ChIJZ_afHecYoFMRmdCl8ef7WCk",
+          },
+          {
+            title: "Little Guy Liquor Co.",
+            address1: "270 Baseline Rd #126",
+            address2: "Sherwood Park, AB T8H 1R4, Canada",
+            coords: { lat: 53.54184361840859, lng: -113.31089617055225 },
+            placeId: "ChIJ0-PnbCsWoFMR5FwtahH1PEk",
+          },
+          {
+            title: "Lo-Cost Liquor Store",
+            address1: "6807 170 St NW",
+            address2: "Edmonton, AB T5T 4W4, Canada",
+            coords: { lat: 53.50326937251044, lng: -113.61445142944774 },
+            placeId: "ChIJv3u6Tj4goFMRrNykOvr6ESs",
+          },
+          {
+            title: "Local Liquor Store",
+            address1: "4234 66 St NW",
+            address2: "Edmonton, AB T6K 4A2, Canada",
+            coords: { lat: 53.48142284512787, lng: -113.44428037055224 },
+            placeId: "ChIJpQzUBecYoFMRUzg3VtN4rgk",
+          },
+          {
+            title: "Longshotz Golf",
+            address1: "2016 Sherwood Dr",
+            address2: "Sherwood Park, AB T8A 3X3, Canada",
+            coords: { lat: 53.52737109930111, lng: -113.29402557055225 },
+            placeId: "ChIJVW8hrekXoFMRc_1JSMAzoDI",
+            actions: [
+              {
+                label: "Order online",
+                defaultUrl:
+                  "https://food.google.com/chooseprovider?restaurantId\u003d/g/11swt_780j",
+              },
+            ],
+          },
+          {
+            title: "Maplewood Liquor Corporation",
+            address1: "52 Brentwood Blvd",
+            address2: "Sherwood Park, AB T8A 2H6, Canada",
+            coords: { lat: 53.51547697508036, lng: -113.2944690171793 },
+            placeId: "ChIJLYpTf7IXoFMRU_8ZQD534fc",
+          },
+          {
+            title: "McSLIQUORS",
+            address1: "4907A 48 Ave",
+            address2: "Camrose, AB T4V 0J4, Canada",
+            coords: { lat: 53.0178323596222, lng: -112.82512032331351 },
+            placeId: "ChIJTUv2RgaPZEERlIZZDZuhxFc",
+          },
+          {
+            title: "Mico Liquor Store",
+            address1: "5103 50th Ave",
+            address2: "Leduc, AB T9E 0B9, Canada",
+            coords: { lat: 53.263714707176966, lng: -113.55291087055225 },
+            placeId: "ChIJs8_qBnX5n1MRRFENim_X660",
+          },
+          {
+            title: "Millbourne Liquor Ltd",
+            address1: "Millbourne Shopping Centre",
+            address2: "190 38 Ave NW, Edmonton, AB T6K 3L6, Canada",
+            coords: { lat: 53.47178704539512, lng: -113.45135297055226 },
+            placeId: "ChIJG02MpNgYoFMRI07vtyvp0PQ",
+          },
+          {
+            title: "Millet Liquor Store \u0027N\u0027 More",
+            address1: "5018 50 St",
+            address2: "Millet, AB T0C 1Z0, Canada",
+            coords: { lat: 53.09610412902453, lng: -113.47249060061168 },
+            placeId: "ChIJodUYpoxWdVMRjP4X-mEreGs",
+          },
+          {
+            title: "Moose Liquor Store",
+            address1: "9301 Wilshire Blvd Unit 111",
+            address2: "Fort Saskatchewan, AB T8L 0W9, Canada",
+            coords: { lat: 53.67375782929983, lng: -113.2478820411045 },
+            placeId: "ChIJccecV085oFMR13fOmOhIxis",
+          },
+          {
+            title: "Overlander Mountain Lodge",
+            address1: "27010 Highway 16 west",
+            address2: "Jasper east, AB T7V 1X3, Canada",
+            coords: { lat: 53.23917990385088, lng: -117.81025478157996 },
+            placeId: "ChIJdWkvNs0pg1MRqEk-zOKZcUM",
+          },
+          {
+            title: "Park West Liquor Loft",
+            address1: "18916 87 Ave NW",
+            address2: "Edmonton, AB T5T 6J1, Canada",
+            coords: { lat: 53.521728966598445, lng: -113.65016513554725 },
+            placeId: "ChIJLUEsnWIgoFMR3KTtpJAGeZc",
+          },
+          {
+            title: "Pineview Cold Beer \u0026 Liquor Store",
+            address1: "9902 93 St Unit# 6",
+            address2: "Fort Saskatchewan, AB T8L 1N4, Canada",
+            coords: { lat: 53.700553012787, lng: -113.23051169447746 },
+            placeId: "ChIJZRZNEIBHoFMRzsmR3j9VrxM",
+          },
+          {
+            title: "Plenty of liquor",
+            address1: "#140",
+            address2: "6802 50 Ave #150, Red Deer, AB T4N 4C9, Canada",
+            coords: { lat: 52.29267750721774, lng: -113.81528917055225 },
+            placeId: "ChIJFUDtlrJVdFMRVH2yt2VpM3Q",
+          },
+          {
+            title: "Prairie Land Liquor",
+            address1: "390 Baseline Rd",
+            address2: "Sherwood Park, AB T8H 1X1, Canada",
+            coords: { lat: 53.54256122143704, lng: -113.30002618834324 },
+            placeId: "ChIJgYlJMC8WoFMRcV7lUVG2YXQ",
+          },
+          {
+            title: "Red Angel Liquor Store",
+            address1: "7464 Gaetz Ave #1",
+            address2: "Red Deer, AB T4P 1X7, Canada",
+            coords: { lat: 52.301996161516364, lng: -113.81538265276127 },
+            placeId: "ChIJyUPudKlVdFMRAsCmtrHe7X8",
+          },
+          {
+            title: "Riverside Golf Course",
+            address1: "8630 Rowland Rd NW",
+            address2: "Edmonton, AB T5J 2T6, Canada",
+            coords: { lat: 53.549614671275606, lng: -113.4646256245369 },
+            placeId: "ChIJFUme5_kioFMRgPmVeKE6UNY",
+          },
+          {
+            title: "Riviera Liquor Store",
+            address1: "5359 Calgary Trail NW",
+            address2: "Edmonton, AB T6H 4J9, Canada",
+            coords: { lat: 53.49173894933594, lng: -113.49292397055225 },
+            placeId: "ChIJe8ByP8EZoFMRxIbiw-ehgko",
+          },
+          {
+            title: "Rosslyn Inn and Suites",
+            address1: "13620 97 St NW",
+            address2: "Edmonton, AB T5E 4E2, Canada",
+            coords: { lat: 53.59802021477825, lng: -113.49263942944775 },
+            placeId: "ChIJ47NuVmIjoFMRtJgCtOGa0dA",
+          },
+          {
+            title: "Sobeys Liquor Garneau",
+            address1: "8204 109 St NW",
+            address2: "Edmonton, AB T6G 1C8, Canada",
+            coords: { lat: 53.51846191171738, lng: -113.51247345276127 },
+            placeId: "ChIJA5Y07BwioFMRR0-TSzi_VFM",
+          },
+          {
+            title: "Safeway Liquor Leduc",
+            address1: "6106 50 St",
+            address2: "Leduc, AB T9E 6P2, Canada",
+            coords: { lat: 53.275644498610745, lng: -113.54997067055226 },
+            placeId: "ChIJBfd-aqT5n1MR59N_x3Af-OA",
+          },
+          {
+            title: "Safeway Liquor Northgate",
+            address1: "9929 114 Ave",
+            address2: "Grande Prairie, AB T8V 4A9, Canada",
+            coords: { lat: 55.1833838185515, lng: -118.78715402331352 },
+            placeId: "ChIJwf1W-lSRkFMRZq72rINXRjs",
+          },
+          {
+            title: "Safeway Sherwood Park Mall",
+            address1: "2020 Sherwood Dr",
+            address2: "Sherwood Park, AB T8A 3H9, Canada",
+            coords: { lat: 53.52922472370566, lng: -113.29399928220901 },
+            placeId: "ChIJce4ukTYWoFMRQ3QGTAGK60Q",
+          },
+          {
+            title: "Sandy Lane Liquor Store",
+            address1: "15610 95 Ave NW",
+            address2: "Edmonton, AB T5P 0A4, Canada",
+            coords: { lat: 53.531900688839094, lng: -113.59126925276125 },
+            placeId: "ChIJl7T4WKghoFMRLerJzgkQLh4",
+          },
+          {
+            title: "7 degrees wine | beer | spirits",
+            address1: "14315 118 Ave NW Unit 116",
+            address2: "Edmonton, AB T5L 4S6, Canada",
+            coords: { lat: 53.57002505058664, lng: -113.5674786411045 },
+            placeId: "ChIJv8RnilghoFMRIDUD3YwO7BE",
+          },
+          {
+            title: "Sherbrooke Liquor",
+            address1: "11819 St Albert Trail NW",
+            address2: "Edmonton, AB T5L 5B5, Canada",
+            coords: { lat: 53.57101096655518, lng: -113.54887745585441 },
+            placeId: "ChIJtaObEOYjoFMRoL-2og2SBHU",
+          },
+          {
+            title: "Sherwood Liquor Land",
+            address1: "28 Strathmoor Dr #201",
+            address2: "Sherwood Park, AB T8H 0C1, Canada",
+            coords: { lat: 53.56707992613205, lng: -113.32425661104507 },
+            placeId: "ChIJh7LxxHI9oFMRK7BwJnCoiO4",
+          },
+          {
+            title: "Sherwood Park Liquor",
+            address1: "993 Fir St #75",
+            address2: "Sherwood Park, AB T8A 4N5, Canada",
+            coords: { lat: 53.51276051520605, lng: -113.32276367055223 },
+            placeId: "ChIJs8KnPFkXoFMRZ_PHCWyYs0U",
+          },
+          {
+            title: "Sobeys Liquor Beaumaris",
+            address1: "15353 Castle Downs Rd NW",
+            address2: "Edmonton, AB T5X 6C3, Canada",
+            coords: { lat: 53.61499212051279, lng: -113.51456670552253 },
+            placeId: "ChIJ53xBx_q6Y0ERcTLc47BEAeU",
+          },
+          {
+            title: "Sobeys Liquor Emerald Hills",
+            address1: "8005 Emerald Dr Unit 2",
+            address2: "Sherwood Park, AB T8H 0P1, Canada",
+            coords: { lat: 53.566043812003144, lng: -113.27213134110451 },
+            placeId: "ChIJ9fnly-Q9oFMRnfLNyE-U6VI",
+          },
+          {
+            title: "Sobeys Liquor Hollick Kenyon",
+            address1: "5215 167 Ave NW",
+            address2: "Edmonton, AB T5Y 0L2, Canada",
+            coords: { lat: 53.62790749884106, lng: -113.41561134110451 },
+            placeId: "ChIJcaTgzmg7oFMRqj4OxULp91s",
+          },
+          {
+            title: "Sobeys Liquor Lakeland",
+            address1: "590 Baseline Rd #120",
+            address2: "Sherwood Park, AB T8H 1Y4, Canada",
+            coords: { lat: 53.54203436630655, lng: -113.26558670552254 },
+            placeId: "ChIJa5rv3hAWoFMRJmHRrJAIv_A",
+          },
+          {
+            title: "Sobeys Liquor Meadowbrook",
+            address1: "3803 34 St NW",
+            address2: "Edmonton, AB T6T 1N2, Canada",
+            coords: { lat: 53.47330183040711, lng: -113.39288134110453 },
+            placeId: "ChIJqwV9s6gZoFMRO11Xgkoe-6g",
+          },
+          {
+            title: "Sobeys Liquor Millwoods",
+            address1: "5221 23 Ave NW",
+            address2: "Edmonton, AB T6L 7G5, Canada",
+            coords: { lat: 53.4537472284473, lng: -113.42322134110451 },
+            placeId: "ChIJ-03KCEAZoFMRM6hV6HYrYSE",
+          },
+          {
+            title: "Sobeys Liquor Nottingham",
+            address1: "688A Wye Rd",
+            address2: "Sherwood Park, AB T8A 6G3, Canada",
+            coords: { lat: 53.51261120934881, lng: -113.27160134110453 },
+            placeId: "ChIJTwTQIJWiY0ERW19vgbdk2j8",
+          },
+          {
+            title: "Sobeys Liquor Southfork",
+            address1: "102 Southfork Dr #104",
+            address2: "Leduc, AB T9E 0E9, Canada",
+            coords: { lat: 53.2437698352364, lng: -113.5419186588955 },
+            placeId: "ChIJt_NyfUH5n1MRaIfkysjoIMY",
+          },
+          {
+            title: "Sobeys Liquor Spruce Grove",
+            address1: "168 Parkland Hwy",
+            address2: "Spruce Grove, AB T7X 3X3, Canada",
+            coords: { lat: 53.54142335631149, lng: -113.92733402331352 },
+            placeId: "ChIJbypp5r-On1MRHyUubeQK9Uw",
+          },
+          {
+            title: "Sobeys Liquor Stony Plain",
+            address1: "4410 48 St #100",
+            address2: "Stony Plain, AB T7Z 1L4, Canada",
+            coords: { lat: 53.53473232774039, lng: -114.00317402331353 },
+            placeId: "ChIJO_jSy9ORn1MR6aQROu7e7io",
+          },
+          {
+            title: "Sobeys Liquor Summit",
+            address1: "585 St Albert Trail #10",
+            address2: "St. Albert, AB T8N 6G5, Canada",
+            coords: { lat: 53.65248100497265, lng: -113.62780967055225 },
+            placeId: "ChIJ3XcCMvsloFMRhGKiLeLFknU",
+          },
+          {
+            title: "Sobeys Liquor Newcastle",
+            address1: "16831 127 St NW",
+            address2: "Edmonton, AB T6V 0T1, Canada",
+            coords: { lat: 53.630409162614676, lng: -113.53931945889549 },
+            placeId: "ChIJvSbL5_4koFMRxHBBTl9hFvg",
+          },
+          {
+            title: "Spirits on 101",
+            address1: "10106 88 Ave",
+            address2: "Fort Saskatchewan, AB T8L 4J9, Canada",
+            coords: { lat: 53.70073744686924, lng: -113.20333167055227 },
+            placeId: "ChIJefiJrnZHoFMRaJyo7VCzflw",
+          },
+          {
+            title: "SSS Liquor",
+            address1: "14 Sioux Rd",
+            address2: "Sherwood Park, AB T8A 4X1, Canada",
+            coords: { lat: 53.534955126589054, lng: -113.32144867055224 },
+            placeId: "ChIJI_tDoM0XoFMRvLVOu355iCI",
+          },
+          {
+            title: "Super Value Liquor Beaumont",
+            address1: "4924 50 Ave",
+            address2: "Beaumont, AB T4X 1J9, Canada",
+            coords: { lat: 53.35272680592281, lng: -113.41509847055225 },
+            placeId: "ChIJJU0Y-RcdoFMRvBZAR7GZhc4",
+            actions: [
+              {
+                label: "Order online",
+                defaultUrl:
+                  "https://food.google.com/chooseprovider?restaurantId\u003d/g/11gx_81nvy",
+              },
+            ],
+          },
+          {
+            title: "Super Value Liquor",
+            address1: "5204 50 St",
+            address2: "Leduc, AB T9E 6Z6, Canada",
+            coords: { lat: 53.26654771665091, lng: -113.55306173005944 },
+            placeId: "ChIJ82l_6Kf5n1MRgKlaVeXMipQ",
+          },
+          {
+            title: "Super Value Liquor",
+            address1: "973 Ordze Rd",
+            address2: "Sherwood Park, AB T8A 4L7, Canada",
+            coords: { lat: 53.51342885523232, lng: -113.3292713411045 },
+            placeId: "ChIJr5D-eJYXoFMRXubFqn4_u1k",
+          },
+          {
+            title: "The Beer Locker",
+            address1: "4717 20 Ave",
+            address2: "Drayton Valley, AB T7A 1S9, Canada",
+            coords: { lat: 53.19338996722489, lng: -114.97598002331353 },
+            placeId: "ChIJi2D1caVHnlMR9ODgY-K8BMA",
+          },
+          {
+            title: "The Liquor Cabinet - St Albert Landing",
+            address1: "410 St Albert Trail #130",
+            address2: "St. Albert, AB T8N 3J6, Canada",
+            coords: { lat: 53.645415930468275, lng: -113.62742890552255 },
+            placeId: "ChIJu-pziUAloFMRsvf7DauvCj8",
+          },
+          {
+            title: "The Liquor Hutch",
+            address1: "150 Leva Ave #102",
+            address2: "Red Deer, AB T4E 0A5, Canada",
+            coords: { lat: 52.21118916681582, lng: -113.81751514110451 },
+            placeId: "ChIJkQxK_VkVdFMRSwssDkoDDwI",
+          },
+          {
+            title: "The Tipsy Liquor",
+            address1: "5302 50 St Unit #117",
+            address2: "Beaumont, AB T4X 1E5, Canada",
+            coords: { lat: 53.355748556382004, lng: -113.41646877055226 },
+            placeId: "ChIJ23jl8s4doFMRDhGhWgI_mSE",
+          },
+          {
+            title: "Tofield Spirits Beer \u0026 Liquor Store",
+            address1: "5028 53 Ave",
+            address2: "Tofield, AB T0B 4J0, Canada",
+            coords: { lat: 53.37070343360555, lng: -112.66848819877663 },
+            placeId: "ChIJlSj-xG13oFMRHJ5apdWvLT0",
+          },
+          {
+            title: "Tops Liquor Store",
+            address1: "10768 82 Ave NW",
+            address2: "Edmonton, AB T6E 2A8, Canada",
+            coords: { lat: 53.518245125719524, lng: -113.50905951779099 },
+            placeId: "ChIJSwGuoBwioFMRWWzOf8v-pzk",
+          },
+          {
+            title: "Value Liquor Hub",
+            address1: "12068 Jasper Ave",
+            address2: "Edmonton, AB T5K 0P3, Canada",
+            coords: { lat: 53.54117555099628, lng: -113.53016057055227 },
+            placeId: "ChIJf-EuACwioFMRl3UGmTiAj-I",
+          },
+          {
+            title: "Value liquor hub",
+            address1: "916 Ash St A",
+            address2: "Sherwood Park, AB T8A 2G1, Canada",
+            coords: { lat: 53.513084819769226, lng: -113.31545383065375 },
+            placeId: "ChIJuTgbY_0XoFMRkGsyB7jeDk8",
+            actions: [
+              {
+                label: "Order online",
+                defaultUrl:
+                  "https://food.google.com/chooseprovider?restaurantId\u003d/g/11h2p_mrwm",
+              },
+            ],
+          },
+          {
+            title: "Vermilion Liquor Store",
+            address1: "4408 Railway Ave",
+            address2: "Vermilion, AB T9X 1E9, Canada",
+            coords: { lat: 53.350176717986834, lng: -110.83541064662704 },
+            placeId: "ChIJA_lRWZ_tCVMRgg0fdedCgo0",
+          },
+          {
+            title: "Viking Cold Beer Liqour Store",
+            address1: "5320 50 St",
+            address2: "Viking, AB T0B 4N0, Canada",
+            coords: { lat: 53.09602804960111, lng: -111.77673838710251 },
+            placeId: "ChIJeZGJ2-tCClMRojjddgvIxF4",
+          },
+          {
+            title: "Wainwright Liquor \u0026 Cold Beer Store Ltd",
+            address1: "1206 10 St",
+            address2: "Wainwright, AB T9W 1E3, Canada",
+            coords: { lat: 52.841185068288034, lng: -110.85282831408615 },
+            placeId: "ChIJ5edySpnWC1MRa_HTxv852UU",
+          },
+          {
+            title: "Westmount Liquor Hub",
+            address1: "10842 124 St",
+            address2: "Edmonton, AB T5M 0H3, Canada",
+            coords: { lat: 53.55375740379554, lng: -113.53614064110451 },
+            placeId: "ChIJ7dXm-6EjoFMRE2x56A4Tcac",
+          },
+          {
+            title: "Whitemud Crossing Liquor",
+            address1: "4211 106 St",
+            address2: "Edmonton, AB T6J 6P3, Canada",
+            coords: { lat: 53.47994838394535, lng: -113.50322765337296 },
+            placeId: "ChIJsbhhwzkfoFMRi_0EHDpJ-UQ",
+          },
+          {
+            title: "Wild Rose Co-op Liquor Store",
+            address1: "5026 50 St",
+            address2: "Killam, AB T0B 2L0, Canada",
+            coords: { lat: 52.792065537884035, lng: -111.85686770552253 },
+            placeId: "ChIJOba3WID_ClMR3nfnR4j420k",
+          },
+        ],
+        mapOptions: {
+          center: { lat: 38.0, lng: -100.0 },
+          fullscreenControl: true,
+          mapTypeControl: false,
+          streetViewControl: false,
+          zoom: 4,
+          zoomControl: true,
+          maxZoom: 17,
+          mapId: "",
+        },
+        mapsApiKey: "AIzaSyDnW4ts-DVXTh7UzqgqdMopAsonzBW3Qfk",
+        capabilities: {
+          input: true,
+          autocomplete: true,
+          directions: true,
+          distanceMatrix: true,
+          details: true,
+          actions: true,
+        },
+      };
+
+      function initMap() {
+        new LocatorPlus(CONFIGURATION);
+      }
+    </script>
+    <script id="locator-result-items-tmpl" type="text/x-handlebars-template">
+      {{#each locations}}
+        <li class="location-result" data-location-index="{{index}}">
+          <button class="select-location">
+            <h2 class="name">{{title}}</h2>
+          </button>
+          <div class="address">{{address1}}<br>{{address2}}</div>
+          <div class="options">
+            <div class="option-container">
+              <button class="details-button option">
+                <span>View details</span>
+              </button>
+            </div>
+            {{#each actions}}
+              <div class="option-container {{#if additionalLinks.length}}dropdown-container{{/if}}">
+                <div class="action-button {{#if defaultUrl}}{{#if additionalLinks.length}}split-action-button{{/if}}{{/if}}">
+                  {{#if defaultUrl}}
+                    <a href="{{defaultUrl}}" target="_blank" class="option">
+                      <span>{{label}}</span>
+                      {{#unless additionalLinks.length}}
+                        <img class="open-icon" src="https://fonts.gstatic.com/s/i/googlematerialicons/open_in_new/v16/24px.svg" alt="open in new window"/>
+                      {{/unless}}
+                    </a>
+                  {{/if}}
+                  {{#if additionalLinks.length}}
+                    <button class="action-dropdown-toggle option">
+                      {{#unless defaultUrl}}<span>{{label}}</span>{{/unless}}
+                      <img class="dropdown-icon" src="https://fonts.gstatic.com/s/i/googlematerialicons/arrow_drop_down/v16/24px.svg" alt="dropdown"/>
+                    </button>
+                  {{/if}}
+                </div>
+                {{#if additionalLinks.length}}
+                  <div class="action-dropdown">
+                    {{#each additionalLinks}}
+                      <a href="{{url}}" target="_blank">
+                        {{#if iconUrl}}
+                          <img src="{{iconUrl}}" alt="icon"/>
+                        {{else}}
+                          <img src="https://fonts.gstatic.com/s/i/googlematerialicons/link/v16/24px.svg" alt="link"/>
+                        {{/if}}
+                        <span>{{name}}</span>
+                      </a>
+                    {{/each}}
+                  </div>
+                {{/if}}
+              </div>
+            {{/each}}
+          </div>
+          {{#if travelDistanceText}}
+            <div class="distance">{{travelDistanceText}}</div>
+          {{/if}}
+          <a class="directions-button" href="" target="_blank" title="Get directions to this location on Google Maps">
+            <svg width="34" height="34" viewBox="0 0 34 34"
+                  fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M17.5867 9.24375L17.9403 8.8902V8.8902L17.5867 9.24375ZM16.4117 9.24375L16.7653 9.59731L16.7675 9.59502L16.4117 9.24375ZM8.91172 16.7437L8.55817 16.3902L8.91172 16.7437ZM8.91172 17.9229L8.55817 18.2765L8.55826 18.2766L8.91172 17.9229ZM16.4117 25.4187H16.9117V25.2116L16.7652 25.0651L16.4117 25.4187ZM16.4117 25.4229H15.9117V25.63L16.0582 25.7765L16.4117 25.4229ZM25.0909 17.9229L25.4444 18.2765L25.4467 18.2742L25.0909 17.9229ZM25.4403 16.3902L17.9403 8.8902L17.2332 9.5973L24.7332 17.0973L25.4403 16.3902ZM17.9403 8.8902C17.4213 8.3712 16.5737 8.3679 16.0559 8.89248L16.7675 9.59502C16.8914 9.4696 17.1022 9.4663 17.2332 9.5973L17.9403 8.8902ZM16.0582 8.8902L8.55817 16.3902L9.26527 17.0973L16.7653 9.5973L16.0582 8.8902ZM8.55817 16.3902C8.0379 16.9105 8.0379 17.7562 8.55817 18.2765L9.26527 17.5694C9.13553 17.4396 9.13553 17.227 9.26527 17.0973L8.55817 16.3902ZM8.55826 18.2766L16.0583 25.7724L16.7652 25.0651L9.26517 17.5693L8.55826 18.2766ZM15.9117 25.4187V25.4229H16.9117V25.4187H15.9117ZM16.0582 25.7765C16.5784 26.2967 17.4242 26.2967 17.9444 25.7765L17.2373 25.0694C17.1076 25.1991 16.895 25.1991 16.7653 25.0694L16.0582 25.7765ZM17.9444 25.7765L25.4444 18.2765L24.7373 17.5694L17.2373 25.0694L17.9444 25.7765ZM25.4467 18.2742C25.9631 17.7512 25.9663 16.9096 25.438 16.3879L24.7354 17.0995C24.8655 17.2279 24.8687 17.4363 24.7351 17.5716L25.4467 18.2742Z" fill="#1967d2"/>
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M19 19.8333V17.75H15.6667V20.25H14V16.9167C14 16.4542 14.3708 16.0833 14.8333 16.0833H19V14L21.9167 16.9167L19 19.8333Z" fill="#1967d2"/>
+              <circle class="directions-button-background" cx="17" cy="17" r="16.5" stroke="#1967d2"/>
+            </svg>
+          </a>
+        </li>
+      {{/each}}
+    </script>
+    <script id="locator-details-tmpl" type="text/x-handlebars-template">
+      <button class="back-button">
+        <img
+          class="icon"
+          src="https://fonts.gstatic.com/s/i/googlematerialicons/arrow_back/v11/24px.svg"
+          alt=""
+        />
+        Back
+      </button>
+      <header>
+        <div class="banner">
+          <svg
+            width="23"
+            height="32"
+            viewBox="0 0 23 32"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              fill-rule="evenodd"
+              clip-rule="evenodd"
+              d="M22.9976 11.5003C22.9976 13.2137 22.7083 14.9123 21.8025 16.7056C18.6321 22.9832 12.7449 24.3314 12.2758 30.7085C12.2448 31.1294 11.9286 31.4744 11.4973 31.4744C11.0689 31.4744 10.7527 31.1294 10.7218 30.7085C10.2527 24.3314 4.3655 22.9832 1.19504 16.7056C0.289306 14.9123 0 13.2137 0 11.5003C0 5.13275 5.14557 0 11.5003 0C17.852 0 22.9976 5.13275 22.9976 11.5003Z"
+              fill="#4285F4"
+            ></path>
+            <path
+              fill-rule="evenodd"
+              clip-rule="evenodd"
+              transform="translate(5.5,5.5)"
+              d="M6 8.84091L9.708 11L8.724 6.92961L12 4.19158L7.6856 3.83881L6 0L4.3144 3.83881L0 4.19158L3.276 6.92961L2.292 11L6 8.84091Z"
+              fill="#FBE15C"
+            ></path>
+          </svg>
+        </div>
+        <h2>{{location.title}}</h2>
+      </header>
+      {{#if location.travelDistanceText}}
+        <div class="distance">{{location.travelDistanceText}} away</div>
+      {{/if}}
+      <div class="address">
+        {{location.address1}}<br />
+        {{location.address2}}
+      </div>
+      <div class="atmosphere">
+        {{#if place.rating}}
+          <span class="star-rating-numeric">{{place.rating}}</span>
+          <span>
+            {{#each place.fullStarIcons}}
+              <img
+                src="https://fonts.gstatic.com/s/i/googlematerialicons/star/v15/24px.svg"
+                alt=""
+                class="star-icon"
+              />
+            {{/each}}
+            {{#each place.halfStarIcons}}
+              <img
+                src="https://fonts.gstatic.com/s/i/googlematerialicons/star_half/v17/24px.svg"
+                alt=""
+                class="star-icon"
+              />
+            {{/each}}
+            {{#each place.emptyStarIcons}}
+              <img
+                src="https://fonts.gstatic.com/s/i/googlematerialicons/star_outline/v9/24px.svg"
+                alt=""
+                class="star-icon"
+              />
+            {{/each}}
+          </span>
+        {{/if}}
+        {{#if place.user_ratings_total}}
+          <a href="{{place.url}}" target="_blank">{{place.user_ratings_total}}
+            reviews</a>
+        {{else}}
+          <a href="{{place.url}}" target="_blank">See on Google Maps</a>
+        {{/if}}
+        {{#if place.price_level}}
+          &bull;
+          <span class="price-dollars">
+            {{#each place.dollarSigns}}${{/each}}
+          </span>
+        {{/if}}
+      </div>
+      <hr />
+      {{#if place.opening_hours}}
+        <div class="hours contact">
+          <img
+            src="https://fonts.gstatic.com/s/i/googlematerialicons/schedule/v12/24px.svg"
+            alt="Opening hours"
+            class="icon"
+          />
+          <div class="right">
+            {{#each place.openingHoursSummary}}
+              <div>
+                <span class="weekday">{{days}}</span>
+                <span class="hours">{{hours}}</span>
+              </div>
+            {{/each}}
+          </div>
+        </div>
+      {{/if}}
+      {{#if place.website}}
+        <div class="website contact">
+          <img
+            src="https://fonts.gstatic.com/s/i/googlematerialicons/public/v10/24px.svg"
+            alt="Website"
+            class="icon"
+          />
+          <div class="right">
+            <a
+              href="{{place.website}}"
+              target="_blank"
+            >{{place.websiteDomain}}</a>
+          </div>
+        </div>
+      {{/if}}
+      {{#if place.formatted_phone_number}}
+        <div class="phone contact">
+          <img
+            src="https://fonts.gstatic.com/s/i/googlematerialicons/phone/v10/24px.svg"
+            alt="Phone number"
+            class="icon"
+          />
+          <div class="right">
+            {{place.formatted_phone_number}}
+          </div>
+        </div>
+      {{/if}}
+      {{#if place.html_attributions}}
+        {{#each place.html_attributions}}
+          <p class="attribution">{{{this}}}</p>
+        {{/each}}
+      {{/if}}
+    </script>
+  </head>
+  <body>
+    <div id="map-container">
+      <div id="locations-panel">
+        <div id="locations-panel-list">
+          <header>
+            <h1 class="search-title">
+              <img
+                src="https://fonts.gstatic.com/s/i/googlematerialicons/place/v15/24px.svg"
+              />
+              Find a location near you
+            </h1>
+            <div class="search-input">
+              <input
+                id="location-search-input"
+                placeholder="Enter your address or zip code"
+              />
+              <div
+                id="search-overlay-search"
+                class="search-input-overlay search"
+              >
+                <button id="location-search-button">
+                  <img
+                    class="icon"
+                    src="https://fonts.gstatic.com/s/i/googlematerialicons/search/v11/24px.svg"
+                    alt="Search"
+                  />
+                </button>
+              </div>
+            </div>
+          </header>
+          <div class="section-name" id="location-results-section-name">
+            All locations
+          </div>
+          <div class="results">
+            <ul id="location-results-list"></ul>
+          </div>
+        </div>
+        <div id="locations-panel-details"></div>
+      </div>
+      <div id="gmp-map"></div>
+    </div>
+    <script
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDnW4ts-DVXTh7UzqgqdMopAsonzBW3Qfk&callback=initMap&libraries=places,geometry&solution_channel=GMP_QB_locatorplus_v6_cABCDEF"
+      async
+      defer
+    ></script>
+    <script type="module">
+      // Import the functions you need from the SDKs you need
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-app.js";
+      // TODO: Add SDKs for Firebase products that you want to use
+      // https://firebase.google.com/docs/web/setup#available-libraries
+    
+      // Your web app's Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyDODrylR-oS59VJ3Di4wGljI9KTiX0zNDE",
+        authDomain: "hawke-map.firebaseapp.com",
+        projectId: "hawke-map",
+        storageBucket: "hawke-map.appspot.com",
+        messagingSenderId: "419006557651",
+        appId: "1:419006557651:web:931456f6d62ed01b425326"
+      };
+    
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+    </script>
+  </body>
+</html>
