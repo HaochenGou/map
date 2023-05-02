@@ -427,6 +427,8 @@
       "use strict";
 
       /** Hide a DOM element. */
+      const image_1 = "https://maps.google.com/mapfiles/kml/pal2/icon26.png";
+
       function hideElement(el) {
         el.style.display = "none";
       }
@@ -511,6 +513,12 @@
             position: location.coords,
             map: locator.map,
             title: location.title,
+            icon: location.image,
+            label: {
+              text: location.label,
+              fontSize: "15px",
+              fontWeight: "bold",
+            },
           });
           marker.addListener("click", function () {
             selectResultItem(index, false, true);
@@ -987,18 +995,21 @@
       const CONFIGURATION = {
         locations: [
           {
-            title: "Hawke Prohibition Distilleries.",
+            title: "Hawke Prohibition Distilleries",
+            info: "Thick & Dirty here",
             address1: "426 Kaska Road",
             address2: "Sherwood Park, AB, Canada",
             coords: { lat: 53.5397775, lng: -113.3308932 },
             placeId: "ChIJy0jPlB8WoFMR0xCbYSBMJbw",
+            image: image_1,
+            label: "T&D",
           },
           {
-            title: "121 JASPER LIQUOR",
-            address1: "12110 Jasper Ave",
-            address2: "Edmonton, AB T5N 3J8, Canada",
-            coords: { lat: 53.54122726979031, lng: -113.53125744662704 },
-            placeId: "ChIJpZ6_5CsioFMR4r-RYydnHpA",
+            title: "7 degrees wine | beer | spirits",
+            address1: "14315 118 Ave NW Unit 116",
+            address2: "Edmonton, AB T5L 4S6, Canada",
+            coords: { lat: 53.57002505058664, lng: -113.5674786411045 },
+            placeId: "ChIJv8RnilghoFMRIDUD3YwO7BE",
           },
           {
             title: "97 Street Liquor Store",
@@ -1022,39 +1033,14 @@
             placeId: "ChIJbaqHYiIjoFMRF4jbdSsCBVY",
           },
           {
-            title: "Aligra",
-            address1: "8882 170 St NW #1423",
-            address2: "Edmonton, AB T5T 4M2, Canada",
-            coords: { lat: 53.52306543963239, lng: -113.62832491779099 },
-            placeId: "ChIJbWmP3F4goFMR9Eqye18MJ1M",
-          },
-          {
-            title: "9709 90 St",
-            address1: "9709 90 St",
-            address2: "Fort Saskatchewan, AB T8L 1K5, Canada",
-            coords: { lat: 53.69857567729397, lng: -113.22926467055225 },
-            placeId: "ChIJfW6fKIA4oFMRGjPxZeifsDE",
-          },
-          {
-            title: "Apollo Liquor Devon",
-            address1: "17 Athabasca Ave #102B",
-            address2: "Devon, AB T9G 1G5, Canada",
-            coords: { lat: 53.36486886523067, lng: -113.73052517055224 },
-            placeId: "ChIJudLqMbnxn1MRdeEqBXlNGCc",
-          },
-          {
-            title: "Arena Liquor",
-            address1: "10266 103 St NW Unit 394",
-            address2: "Edmonton, AB T5J 0Y8, Canada",
-            coords: { lat: 53.54448925155062, lng: -113.49808265889551 },
-            placeId: "ChIJfwXnczGjY0ERMRwj4ePOmAs",
-          },
-          {
             title: "Aspen Liquor Store",
+            info: "Thick & Dirty here",
             address1: "4320 50 St",
             address2: "Drayton Valley, AB T7A 1M4, Canada",
             coords: { lat: 53.21581138490045, lng: -114.97762854662705 },
             placeId: "ChIJIwJ-9ghHnlMR9xhMSfo4SLU",
+            image: image_1,
+            label: "T&D",
           },
           {
             title: "B \u0026 B Liquor Store",
@@ -1062,6 +1048,16 @@
             address2: "Drayton Valley, AB T7A 1R6, Canada",
             coords: { lat: 53.22171532455829, lng: -114.97868268220901 },
             placeId: "ChIJhwBzvaVHnlMRYaeBiDWwIT0",
+          },
+          {
+            title: "Beer Locker",
+            info: "Thick & Dirty here",
+            address1: "4717 20 Ave",
+            address2: "Drayton Valley, AB T7A 1S9, Canada",
+            coords: { lat: 53.19338996722489, lng: -114.97598002331353 },
+            placeId: "ChIJi2D1caVHnlMR9ODgY-K8BMA",
+            image: image_1,
+            label: "T&D",
           },
           {
             title: "Bellerose Liquor Store",
@@ -1085,25 +1081,24 @@
             placeId: "ChIJ5bUv9pIhoFMRWoFd31R_1YM",
           },
           {
-            title: "BT Liquor",
-            address1: "88 Howarth St #5",
-            address2: "Red Deer, AB T4N 6V9, Canada",
-            coords: { lat: 52.282214130827164, lng: -113.83655067055226 },
-            placeId: "ChIJfwstJO5VdFMR7UJeBAsPajM",
+            title: "Brandywine \u0026 Brew",
+            info: "Thick & Dirty here",
+            address1: "4846 47 St",
+            address2: "Sedgewick, AB T0B 4C0, Canada",
+            coords: { lat: 52.77512100769653, lng: -111.6914501 },
+            placeId: "ChIJ7RgjM6qsC1MRsU7MUOjNBQs",
+            image: image_1,
+            label: "T&D",
           },
           {
-            title: "Burnt Lake Liquor Store",
-            address1: "102",
-            address2: "Burnt Lake Trail, Red Deer, AB T4S 2L4, Canada",
-            coords: { lat: 52.28588619737883, lng: -113.87217920552253 },
-            placeId: "ChIJKW6wk3tUdFMRBjVNDsH2Y0g",
-          },
-          {
-            title: "5709 48 Ave",
+            title: "C2H5 Liquor",
+            info: "Thick & Dirty here",
             address1: "5709 48 Ave",
             address2: "Camrose, AB T4V 0J9, Canada",
             coords: { lat: 53.01768591931846, lng: -112.83969112944774 },
             placeId: "ChIJ_Xxm3c27ClMRIXyUhA30mdo",
+            image: image_1,
+            label: "T&D",
           },
           {
             title: "Callingwood Liquor Ltd.",
@@ -1120,18 +1115,28 @@
             placeId: "ChIJow4Ee7EloFMRWyi6ukZ9MiE",
           },
           {
-            title: "13704 Castle Downs Rd NW",
+            title: "Castle Liqipr Ltd",
             address1: "13704 Castle Downs Rd NW",
             address2: "Edmonton, AB T5X 4H7, Canada",
             coords: { lat: 53.60013689244518, lng: -113.51763538220901 },
             placeId: "ChIJH2U9p4AkoFMRuwpd-Ekl6Zc",
           },
           {
-            title: "6201 46 Ave",
+            title: "Central Alberta Co-op",
             address1: "6201 46 Ave",
             address2: "Red Deer, AB T4N 6Z1, Canada",
             coords: { lat: 52.28619895616461, lng: -113.80150235276128 },
             placeId: "ChIJMTJOCrZVdFMRiUHVWKVVT9E",
+          },
+          {
+            title: "Century Park Cellars",
+            info: "Thick & Dirty here",
+            address1: "2349 111 St NW",
+            address2: "Edmonton, AB T6J 5E5, Canada",
+            coords: { lat: 53.45452632239717, lng: -113.51444756441803 },
+            placeId: "ChIJGbQDMmIfoFMR9uPb6QW8K64",
+            image: image_1,
+            label: "T&D",
           },
           {
             title: "Central Social Hall",
@@ -1153,32 +1158,6 @@
             ],
           },
           {
-            title: "Central Social Hall",
-            address1: "525 St Albert Trail #280",
-            address2: "St. Albert, AB T8N 4J8, Canada",
-            coords: { lat: 53.65086860192073, lng: -113.62726504110451 },
-            placeId: "ChIJ6S-OceQloFMR1gKdZa4pk7s",
-            actions: [
-              {
-                label: "Order online",
-                defaultUrl:
-                  "https://food.google.com/chooseprovider?restaurantId\u003d/g/11b7m98wg3",
-              },
-              {
-                label: "Reserve a table",
-                defaultUrl:
-                  "https://www.opentable.ca/restaurant/profile/1076842?ref\u003d16423",
-              },
-            ],
-          },
-          {
-            title: "Central Social Hall",
-            address1: "10010 12 Ave SW",
-            address2: "Edmonton, AB T6X 0P9, Canada",
-            coords: { lat: 53.42422738523966, lng: -113.48786387055226 },
-            placeId: "ChIJT0NLi7gfoFMRLDxYoeDiqcM",
-          },
-          {
             title: "Chateau Louis Liquor Store",
             address1: "11450 117 St NW",
             address2: "Edmonton, AB T5G 3E8, Canada",
@@ -1187,38 +1166,50 @@
           },
           {
             title: "CJ\u0027s Liquor Unlimited",
+            info: "Thick & Dirty here",
             address1: "3823 Caxton St",
             address2: "Whitecourt, AB T7S 1P3, Canada",
             coords: { lat: 54.12618346084842, lng: -115.66476767055225 },
             placeId: "ChIJu6MIMFzTnlMRt_Al_sBcijo",
+            image: image_1,
+            label: "T&D",
           },
           {
-            title: "Clareview Liquor",
-            address1: "13750 50 St NW #8",
-            address2: "Edmonton, AB T5A 5J6, Canada",
-            coords: { lat: 53.598471218743796, lng: -113.41443092270183 },
-            placeId: "ChIJDwo7V-U9oFMRAWKOowMR7BE",
+            title: "Cold Beer \u0026 Liquor Store The",
+            info: "Thick & Dirty here",
+            address1: "5007 50 St",
+            address2: "Eckville, AB T0M 0X0, Canada",
+            coords: { lat: 52.35943137979328, lng: -114.36758324603271 },
+            placeId: "ChIJkw0UTjG2dVMRl6JEQFtptk0",
+            image: image_1,
+            label: "T&D",
           },
           {
-            title: "Leduc Co-op Liquor",
+            title: "Co-op Liquor Leduc",
             address1: "100B Deer Valley Dr #103",
             address2: "Leduc, AB T9E 0S3, Canada",
             coords: { lat: 53.266031014266495, lng: -113.59271481716196 },
             placeId: "ChIJ9VLz6Cn6n1MR2ylYqkeap44",
           },
           {
-            title: "Co-op Liquor",
+            title: "Co-op Liquor Stoneridge",
+            info: "Thick & Dirty here",
             address1: "10402 67th Ave",
             address2: "Grande Prairie, AB T8W 0K8, Canada",
             coords: { lat: 55.14100488505009, lng: -118.8091221588955 },
             placeId: "ChIJv4N2rh2RkFMR_62-OL7jKNY",
+            image: image_1,
+            label: "T&D",
           },
           {
-            title: "Co-op Liquor",
+            title: "Co-op Liquor Trader Ridge",
+            info: "Thick & Dirty here",
             address1: "13204 102 St",
             address2: "Grande Prairie, AB T8V 1X9, Canada",
             coords: { lat: 55.20076399156504, lng: -118.80178974110451 },
             placeId: "ChIJq_Mn0USVkFMRegIfpS3X3GI",
+            image: image_1,
+            label: "T&D",
           },
           {
             title: "Country Garden Liquor Store",
@@ -1228,7 +1219,7 @@
             placeId: "ChIJ4zRsJee7ClMRUPVpOtmBBDc",
           },
           {
-            title: "221 Chippewa Rd",
+            title: "Crooked mouth pub",
             address1: "221 Chippewa Rd",
             address2: "Sherwood Park, AB T8A 4E6, Canada",
             coords: { lat: 53.53779611930402, lng: -113.32394506934624 },
@@ -1236,10 +1227,13 @@
           },
           {
             title: "Crossroads Liquor",
+            info: "Thick & Dirty here",
             address1: "975 Broadmoor Blvd #46",
             address2: "Sherwood Park, AB T8A 5W9, Canada",
             coords: { lat: 53.540104075172806, lng: -113.32088370552253 },
             placeId: "ChIJMWCqnNYXoFMRNagtom63Rb8",
+            image: image_1,
+            label: "T&D",
           },
           {
             title: "Crown Liquor Store",
@@ -1250,10 +1244,13 @@
           },
           {
             title: "Dales Liquor Store",
+            info: "Thick & Dirty here",
             address1: "4809 51 Ave",
             address2: "Camrose, AB T4V 0V4, Canada",
             coords: { lat: 53.02347066050922, lng: -112.8221654411045 },
             placeId: "ChIJy01QusO7ClMRJOerRubS4Nk",
+            image: image_1,
+            label: "T&D",
           },
           {
             title: "Delton Liquor Mart",
@@ -1263,14 +1260,7 @@
             placeId: "ChIJl3aeIUAjoFMRNfDM_FIyXe0",
           },
           {
-            title: "Easy Liquor Capilano",
-            address1: "4938 98 Ave NW",
-            address2: "Edmonton, AB T6B 2Y7, Canada",
-            coords: { lat: 53.53829200150058, lng: -113.41568468220902 },
-            placeId: "ChIJ4VzxkIkjoFMRq6AsHWSUZVs",
-          },
-          {
-            title: "ECONO LIQUOR",
+            title: "ECONO LIQUOR 6",
             address1: "4313 167 Ave NW",
             address2: "Edmonton, AB T5Y 3Y2, Canada",
             coords: { lat: 53.628165762567725, lng: -113.40635665889549 },
@@ -1289,13 +1279,6 @@
             address2: "Stony Plain, AB T7Z 2J7, Canada",
             coords: { lat: 53.53254509478572, lng: -113.9900620411045 },
             placeId: "ChIJgVy299WRn1MRkFENcR_m2xs",
-          },
-          {
-            title: "Everything Wine And More",
-            address1: "100 Broadview Dr #25",
-            address2: "Sherwood Park, AB T8H 0T5, Canada",
-            coords: { lat: 53.54334679462045, lng: -113.31571760552255 },
-            placeId: "ChIJ4cDrlCoWoFMRSMaxpJrLm-A",
           },
           {
             title: "Evolution Liquor Store",
@@ -1319,39 +1302,31 @@
             placeId: "ChIJcxdLKToioFMRJ4Sni6ht3gM",
           },
           {
-            title: "Gentlemen\u0027s Liquor Store",
-            address1: "4810 50 Ave",
-            address2: "Wetaskiwin, AB T9A 0S2, Canada",
-            coords: { lat: 52.96941242785532, lng: -113.37116547055224 },
-            placeId: "ChIJ8yosWzlOdVMRFJvHzfx0bio",
-          },
-          {
             title: "Glassy Liquor",
+            info: "Thick & Dirty here",
             address1: "3377 28 Ave SW",
             address2: "Edmonton, AB T6X 1A5, Canada",
             coords: { lat: 53.40723342665906, lng: -113.39353052331352 },
             placeId: "ChIJOV34D5EboFMRg7YGrUfVzrM",
+            image: image_1,
+            label: "T&D",
           },
           {
-            title: "GREAT LIQUOR Nisku",
-            address1: "205 19 Ave #1",
-            address2: "Nisku, AB T9E 0W8, Canada",
-            coords: { lat: 53.33476283477657, lng: -113.54141035274391 },
-            placeId: "ChIJ4a1Cz5T3n1MR8bC9caDiris",
-          },
-          {
-            title: "GREAT LIQUOR",
-            address1: "99 Wye Rd #17",
-            address2: "Sherwood Park, AB T8B 1M1, Canada",
-            coords: { lat: 53.51119935516584, lng: -113.33179274110451 },
-            placeId: "ChIJi54bDSAXoFMR0dyJnt5E6bY",
+            title: "G P Liquor For Less Ltd",
+            address1: "10001 97 Ave Unit 103",
+            address2: "Grande Prairie, AB T8V 0N3, Canada",
+            coords: { lat: 55.167670623517594, lng: -118.79530242331352 },
+            placeId: "ChIJA9R8lEmRkFMRovSk1pOi7Qw",
           },
           {
             title: "Harley\u0027s Liquor Store",
+            info: "Thick & Dirty here",
             address1: "6520 48 Ave",
             address2: "Camrose, AB T4V 3A3, Canada",
             coords: { lat: 53.01859320185535, lng: -112.85383064110451 },
             placeId: "ChIJiQuTkjO6ClMRbEiwh6Yg9QE",
+            image: image_1,
+            label: "T&D",
           },
           {
             title: "Hi End Liquor - Walker",
@@ -1362,10 +1337,13 @@
           },
           {
             title: "Hidden Gems Tavern",
+            info: "Thick & Dirty here",
             address1: "4912 50 St",
             address2: "Egremont, AB T0A 0Z0, Canada",
             coords: { lat: 54.037740375643885, lng: -113.12536011165676 },
             placeId: "ChIJWdlbQKlvpFMRVHXKzox0rrA",
+            image: image_1,
+            label: "T&D",
           },
           {
             title: "Hi End Liquor - Desrochers",
@@ -1375,18 +1353,14 @@
             placeId: "ChIJZ6wTQVQdoFMRqi4fbX70rwo",
           },
           {
-            title: "J\u0027s Prime Liquor",
-            address1: "3235 50 Ave B",
-            address2: "Red Deer, AB T4N 3Y1, Canada",
-            coords: { lat: 52.25169682267688, lng: -113.81301668834323 },
-            placeId: "ChIJ7Y31OaRXdFMRxpOVXRrmRT8",
-            actions: [
-              {
-                label: "Order online",
-                defaultUrl:
-                  "https://food.google.com/chooseprovider?restaurantId\u003d/g/11r4m7glmp",
-              },
-            ],
+            title: "Hinton Liquor Store",
+            info: "Thick & Dirty here",
+            address1: "125 Jasper St",
+            address2: "Hinton, AB T7V 2A8, Canada",
+            coords: { lat: 53.39879238249401, lng: -117.5910974 },
+            placeId: "ChIJTxl9h-ONnFMR3wOGnvRewtU",
+            image: image_1,
+            label: "T&D",
           },
           {
             title: "J \u0026 K Liquor Stop",
@@ -1403,11 +1377,14 @@
             placeId: "ChIJ0c8O8dUloFMRxji5tqwoctI",
           },
           {
-            title: "Liquor4U",
-            address1: "619 Cameron Heights Dr NW",
-            address2: "Edmonton, AB T6M 0L9, Canada",
-            coords: { lat: 53.47012620955865, lng: -113.63146785889549 },
-            placeId: "ChIJKwRsN3z1n1MR0TuW-Y_C1l0",
+            title: "Lakeview Liquor Store",
+            info: "Thick & Dirty here",
+            address1: "4802 49 St",
+            address2: "Hardisty, AB T0B 1V0, Canada",
+            coords: { lat: 52.67278720989873, lng: -111.3102185705349 },
+            placeId: "ChIJPe-c4le3C1MR28wgKoHw6uc",
+            image: image_1,
+            label: "T&D",
           },
           {
             title: "Liquor by Mehbs",
@@ -1415,6 +1392,13 @@
             address2: "Leduc, AB T9E 4R1, Canada",
             coords: { lat: 53.257634142400995, lng: -113.54044761165676 },
             placeId: "ChIJ9UmtYRL5n1MRrw6HEzBDPXM",
+          },
+          {
+            title: "Liquor Cabinet - St Albert Landing",
+            address1: "410 St Albert Trail #130",
+            address2: "St. Albert, AB T8N 3J6, Canada",
+            coords: { lat: 53.645415930468275, lng: -113.62742890552255 },
+            placeId: "ChIJu-pziUAloFMRsvf7DauvCj8",
           },
           {
             title: "Liquor Choice",
@@ -1432,17 +1416,13 @@
           },
           {
             title: "Liquor Exchange",
+            info: "Thick & Dirty here",
             address1: "3840 Sherwood Dr #410",
             address2: "Sherwood Park, AB T8H 0Z9, Canada",
             coords: { lat: 53.55522578299701, lng: -113.29328217055226 },
             placeId: "ChIJHRpvl4M9oFMRyobPYowfiO4",
-          },
-          {
-            title: "G P Liquor For Less Ltd",
-            address1: "10001 97 Ave Unit 103",
-            address2: "Grande Prairie, AB T8V 0N3, Canada",
-            coords: { lat: 55.167670623517594, lng: -118.79530242331352 },
-            placeId: "ChIJA9R8lEmRkFMRovSk1pOi7Qw",
+            image: image_1,
+            label: "T&D",
           },
           {
             title: "Liquor Fort",
@@ -1459,39 +1439,14 @@
             placeId: "ChIJyb_FaMg8oFMRzvqXBjZNCas",
           },
           {
-            title: "Liquor House",
-            address1: "15255 111 Ave NW",
-            address2: "Edmonton, AB T5M 2R1, Canada",
-            coords: { lat: 53.558528074967846, lng: -113.58392822147846 },
-            placeId: "ChIJuYWa_2khoFMRdsuiYOaPuNs",
-            actions: [
-              {
-                label: "Order online",
-                defaultUrl:
-                  "https://food.google.com/chooseprovider?restaurantId\u003d/g/11nnv_2vc0",
-              },
-            ],
-          },
-          {
-            title: "Liquor House - 11730 Jasper Ave",
-            address1: "11730 Jasper Ave",
-            address2: "Edmonton, AB T5K 0N3, Canada",
-            coords: { lat: 53.54159790000001, lng: -113.52408628220901 },
-            placeId: "ChIJK1TZI-UjoFMRNiGi9JzGPFs",
-          },
-          {
             title: "Liquor House - Fort Saskatchewan",
+            info: "Thick & Dirty here",
             address1: "130 Westpark Blvd",
             address2: "Fort Saskatchewan, AB T8L 0B2, Canada",
             coords: { lat: 53.68145989497928, lng: -113.24867625889549 },
             placeId: "ChIJM-iUS0E5oFMRadodkwZBEh8",
-          },
-          {
-            title: "Liquor House - 11314 Jasper Ave",
-            address1: "11314 Jasper Ave",
-            address2: "Edmonton, AB T5K 0L8, Canada",
-            coords: { lat: 53.541281276606846, lng: -113.51636501165676 },
-            placeId: "ChIJJWndVDAioFMREhHfbg-JSmk",
+            image: image_1,
+            label: "T&D",
           },
           {
             title: "Liquor House - Southridge",
@@ -1508,18 +1463,11 @@
             ],
           },
           {
-            title: "Liquor Hut Tamarack",
-            address1: "2427 Maple Rd NW",
-            address2: "Edmonton, AB T6T 0Y3, Canada",
-            coords: { lat: 53.47784311973995, lng: -113.3663642411045 },
-            placeId: "ChIJr7Lb-OEZoFMR9KmmaDgXKm4",
-            actions: [
-              {
-                label: "Order online",
-                defaultUrl:
-                  "https://food.google.com/chooseprovider?restaurantId\u003d/g/11r50l5lx4",
-              },
-            ],
+            title: "Liquor Hutch",
+            address1: "150 Leva Ave #102",
+            address2: "Red Deer, AB T4E 0A5, Canada",
+            coords: { lat: 52.21118916681582, lng: -113.81751514110451 },
+            placeId: "ChIJkQxK_VkVdFMRSwssDkoDDwI",
           },
           {
             title: "Liquor Hut Edmonton",
@@ -1535,40 +1483,13 @@
               },
             ],
           },
+
           {
-            title: "Liquor Island",
-            address1: "Hamptons Terrace",
-            address2: "20122 Lessard Rd NW, Edmonton, AB T6M 0V5, Canada",
-            coords: { lat: 53.47835668980388, lng: -113.67362947055224 },
-            placeId: "ChIJB7HD6aKLn1MRsf88JMg1MaU",
-          },
-          {
-            title: "Liquor Island",
+            title: "Liquor Island La Perie",
             address1: "9772 182 St NW",
             address2: "Edmonton, AB T5T 3T9, Canada",
             coords: { lat: 53.533398831010985, lng: -113.63893412331352 },
             placeId: "ChIJSQOwGl8hoFMR_--PzMt1lzw",
-          },
-          {
-            title: "Liquor King",
-            address1: "209 Calahoo Rd",
-            address2: "Spruce Grove, AB T7X 1R1, Canada",
-            coords: { lat: 53.54292087274743, lng: -113.91070601165676 },
-            placeId: "ChIJ3fm_SfGOn1MR72aOduv9te0",
-          },
-          {
-            title: "Liquor Merchants",
-            address1: "11148 82 Ave NW",
-            address2: "Edmonton, AB T6G 2L8, Canada",
-            coords: { lat: 53.51828469533959, lng: -113.51964517055227 },
-            placeId: "ChIJiURBL_YhoFMRAlRW2UCcHcY",
-          },
-          {
-            title: "Liquor Merchants",
-            address1: "13132 82 St NW",
-            address2: "Edmonton, AB T5E 2T5, Canada",
-            coords: { lat: 53.591974206519616, lng: -113.46804538713724 },
-            placeId: "ChIJd4ZPG0MjoFMR1XVXRS2PPe8",
           },
           {
             title: "Liquor Nation",
@@ -1577,13 +1498,7 @@
             coords: { lat: 53.52755112806138, lng: -113.29423101165676 },
             placeId: "ChIJU1tAizUWoFMR1WnAj5hhfOI",
           },
-          {
-            title: "Liquor Store On 111th",
-            address1: "9611 111 Ave NW",
-            address2: "Edmonton, AB T5G 0A9, Canada",
-            coords: { lat: 53.559009650431804, lng: -113.48995288834323 },
-            placeId: "ChIJwXsSdqwjoFMRNXEkSiRk-3c",
-          },
+
           {
             title: "Liquor Planet",
             address1: "9925 100 St",
@@ -1604,13 +1519,6 @@
             address2: "Edmonton, AB T5P 4A4, Canada",
             coords: { lat: 53.541684395009234, lng: -113.6021599411045 },
             placeId: "ChIJ-RuV4wQhoFMRKR-SZ--vbC4",
-          },
-          {
-            title: "Liquor Studio",
-            address1: "15255 111 Ave NW",
-            address2: "Edmonton, AB T5M 2R1, Canada",
-            coords: { lat: 53.55853123392666, lng: -113.58392964110452 },
-            placeId: "ChIJJdNAAEIhoFMRjt3RTRI5tIM",
           },
           {
             title: "Liquor Today",
@@ -1641,32 +1549,14 @@
             placeId: "ChIJEaCrfInJp1MRNeQdn_eMEdI",
           },
           {
-            title: "Liquor XS",
-            address1: "4234 66 St NW",
-            address2: "Edmonton, AB T6K 4A2, Canada",
-            coords: { lat: 53.48142367812216, lng: -113.44427902944773 },
-            placeId: "ChIJZ_afHecYoFMRmdCl8ef7WCk",
-          },
-          {
             title: "Little Guy Liquor Co.",
+            info: "Thick & Dirty here",
             address1: "270 Baseline Rd #126",
             address2: "Sherwood Park, AB T8H 1R4, Canada",
             coords: { lat: 53.54184361840859, lng: -113.31089617055225 },
             placeId: "ChIJ0-PnbCsWoFMR5FwtahH1PEk",
-          },
-          {
-            title: "Lo-Cost Liquor Store",
-            address1: "6807 170 St NW",
-            address2: "Edmonton, AB T5T 4W4, Canada",
-            coords: { lat: 53.50326937251044, lng: -113.61445142944774 },
-            placeId: "ChIJv3u6Tj4goFMRrNykOvr6ESs",
-          },
-          {
-            title: "Local Liquor Store",
-            address1: "4234 66 St NW",
-            address2: "Edmonton, AB T6K 4A2, Canada",
-            coords: { lat: 53.48142284512787, lng: -113.44428037055224 },
-            placeId: "ChIJpQzUBecYoFMRUzg3VtN4rgk",
+            image: image_1,
+            label: "T&D",
           },
           {
             title: "Longshotz Golf",
@@ -1684,10 +1574,13 @@
           },
           {
             title: "Maplewood Liquor Corporation",
+            info: "Thick & Dirty here",
             address1: "52 Brentwood Blvd",
             address2: "Sherwood Park, AB T8A 2H6, Canada",
             coords: { lat: 53.51547697508036, lng: -113.2944690171793 },
             placeId: "ChIJLYpTf7IXoFMRU_8ZQD534fc",
+            image: image_1,
+            label: "T&D",
           },
           {
             title: "McSLIQUORS",
@@ -1705,38 +1598,43 @@
           },
           {
             title: "Millbourne Liquor Ltd",
+            info: "Thick & Dirty here",
             address1: "Millbourne Shopping Centre",
             address2: "190 38 Ave NW, Edmonton, AB T6K 3L6, Canada",
             coords: { lat: 53.47178704539512, lng: -113.45135297055226 },
             placeId: "ChIJG02MpNgYoFMRI07vtyvp0PQ",
+            image: image_1,
+            label: "T&D",
           },
           {
             title: "Millet Liquor Store \u0027N\u0027 More",
+            info: "Thick & Dirty here",
             address1: "5018 50 St",
             address2: "Millet, AB T0C 1Z0, Canada",
             coords: { lat: 53.09610412902453, lng: -113.47249060061168 },
             placeId: "ChIJodUYpoxWdVMRjP4X-mEreGs",
+            image: image_1,
+            label: "T&D",
           },
           {
             title: "Moose Liquor Store",
+            info: "Thick & Dirty here",
             address1: "9301 Wilshire Blvd Unit 111",
             address2: "Fort Saskatchewan, AB T8L 0W9, Canada",
             coords: { lat: 53.67375782929983, lng: -113.2478820411045 },
             placeId: "ChIJccecV085oFMR13fOmOhIxis",
+            image: image_1,
+            label: "T&D",
           },
           {
             title: "Overlander Mountain Lodge",
+            info: "Thick & Dirty here",
             address1: "27010 Highway 16 west",
             address2: "Jasper east, AB T7V 1X3, Canada",
             coords: { lat: 53.23917990385088, lng: -117.81025478157996 },
             placeId: "ChIJdWkvNs0pg1MRqEk-zOKZcUM",
-          },
-          {
-            title: "Park West Liquor Loft",
-            address1: "18916 87 Ave NW",
-            address2: "Edmonton, AB T5T 6J1, Canada",
-            coords: { lat: 53.521728966598445, lng: -113.65016513554725 },
-            placeId: "ChIJLUEsnWIgoFMR3KTtpJAGeZc",
+            image: image_1,
+            label: "T&D",
           },
           {
             title: "Pineview Cold Beer \u0026 Liquor Store",
@@ -1788,11 +1686,14 @@
             placeId: "ChIJ47NuVmIjoFMRtJgCtOGa0dA",
           },
           {
-            title: "Sobeys Liquor Garneau",
-            address1: "8204 109 St NW",
-            address2: "Edmonton, AB T6G 1C8, Canada",
-            coords: { lat: 53.51846191171738, lng: -113.51247345276127 },
-            placeId: "ChIJA5Y07BwioFMRR0-TSzi_VFM",
+            title: "Safeway Heritage",
+            info: "Thick & Dirty here",
+            address1: "2304 109 St NW",
+            address2: "Edmonton, AB T6J 5E5, Canada",
+            coords: { lat: 53.45471516681877, lng: -113.509828 },
+            placeId: "ChIJEYeoC-QeoFMRdT16gXRRaQk",
+            image: image_1,
+            label: "T&D",
           },
           {
             title: "Safeway Liquor Leduc",
@@ -1810,10 +1711,13 @@
           },
           {
             title: "Safeway Sherwood Park Mall",
+            info: "Thick & Dirty here",
             address1: "2020 Sherwood Dr",
             address2: "Sherwood Park, AB T8A 3H9, Canada",
             coords: { lat: 53.52922472370566, lng: -113.29399928220901 },
             placeId: "ChIJce4ukTYWoFMRQ3QGTAGK60Q",
+            image: image_1,
+            label: "T&D",
           },
           {
             title: "Sandy Lane Liquor Store",
@@ -1821,13 +1725,6 @@
             address2: "Edmonton, AB T5P 0A4, Canada",
             coords: { lat: 53.531900688839094, lng: -113.59126925276125 },
             placeId: "ChIJl7T4WKghoFMRLerJzgkQLh4",
-          },
-          {
-            title: "7 degrees wine | beer | spirits",
-            address1: "14315 118 Ave NW Unit 116",
-            address2: "Edmonton, AB T5L 4S6, Canada",
-            coords: { lat: 53.57002505058664, lng: -113.5674786411045 },
-            placeId: "ChIJv8RnilghoFMRIDUD3YwO7BE",
           },
           {
             title: "Sherbrooke Liquor",
@@ -1852,17 +1749,40 @@
           },
           {
             title: "Sobeys Liquor Beaumaris",
+            info: "Thick & Dirty here",
             address1: "15353 Castle Downs Rd NW",
             address2: "Edmonton, AB T5X 6C3, Canada",
             coords: { lat: 53.61499212051279, lng: -113.51456670552253 },
             placeId: "ChIJ53xBx_q6Y0ERcTLc47BEAeU",
+            image: image_1,
+            label: "T&D",
+          },
+          {
+            title: "Sobeys Liquor Edson 50 St.",
+            info: "Thick & Dirty here",
+            address1: "624 50 St",
+            address2: "Edson, AB T7E 1B4, Canada",
+            coords: { lat: 53.585686268073246, lng: -116.43463 },
+            placeId: "ChIJuZvNbXoinFMRWUEv5fziq6w",
+            image: image_1,
+            label: "T&D",
           },
           {
             title: "Sobeys Liquor Emerald Hills",
+            info: "Thick & Dirty here",
             address1: "8005 Emerald Dr Unit 2",
             address2: "Sherwood Park, AB T8H 0P1, Canada",
             coords: { lat: 53.566043812003144, lng: -113.27213134110451 },
             placeId: "ChIJ9fnly-Q9oFMRnfLNyE-U6VI",
+            image: image_1,
+            label: "T&D",
+          },
+          {
+            title: "Sobeys Liquor Garneau",
+            address1: "8204 109 St NW",
+            address2: "Edmonton, AB T6G 1C8, Canada",
+            coords: { lat: 53.51846191171738, lng: -113.51247345276127 },
+            placeId: "ChIJA5Y07BwioFMRR0-TSzi_VFM",
           },
           {
             title: "Sobeys Liquor Hollick Kenyon",
@@ -1880,17 +1800,33 @@
           },
           {
             title: "Sobeys Liquor Meadowbrook",
+            info: "Thick & Dirty here",
             address1: "3803 34 St NW",
             address2: "Edmonton, AB T6T 1N2, Canada",
             coords: { lat: 53.47330183040711, lng: -113.39288134110453 },
             placeId: "ChIJqwV9s6gZoFMRO11Xgkoe-6g",
+            image: image_1,
+            label: "T&D",
           },
           {
             title: "Sobeys Liquor Millwoods",
+            info: "Thick & Dirty here",
             address1: "5221 23 Ave NW",
             address2: "Edmonton, AB T6L 7G5, Canada",
             coords: { lat: 53.4537472284473, lng: -113.42322134110451 },
             placeId: "ChIJ-03KCEAZoFMRM6hV6HYrYSE",
+            image: image_1,
+            label: "T&D",
+          },
+          {
+            title: "Sobeys Liquor Newcastle",
+            info: "Thick & Dirty here",
+            address1: "16831 127 St NW",
+            address2: "Edmonton, AB T6V 0T1, Canada",
+            coords: { lat: 53.630409162614676, lng: -113.53931945889549 },
+            placeId: "ChIJvSbL5_4koFMRxHBBTl9hFvg",
+            image: image_1,
+            label: "T&D",
           },
           {
             title: "Sobeys Liquor Nottingham",
@@ -1898,6 +1834,16 @@
             address2: "Sherwood Park, AB T8A 6G3, Canada",
             coords: { lat: 53.51261120934881, lng: -113.27160134110453 },
             placeId: "ChIJTwTQIJWiY0ERW19vgbdk2j8",
+          },
+          {
+            title: "Sobeys Liquor Rocky Mountain House",
+            info: "Thick & Dirty here",
+            address1: "4513 52 Ave",
+            address2: "Rocky Mountain House, AB T4T 1E9, Canada",
+            coords: { lat: 52.376814779379835, lng: -114.9125442 },
+            placeId: "ChIJKYXwWjLZdVMRgTdGFm9uqbk",
+            image: image_1,
+            label: "T&D",
           },
           {
             title: "Sobeys Liquor Southfork",
@@ -1908,10 +1854,13 @@
           },
           {
             title: "Sobeys Liquor Spruce Grove",
+            info: "Thick & Dirty here",
             address1: "168 Parkland Hwy",
             address2: "Spruce Grove, AB T7X 3X3, Canada",
             coords: { lat: 53.54142335631149, lng: -113.92733402331352 },
             placeId: "ChIJbypp5r-On1MRHyUubeQK9Uw",
+            image: image_1,
+            label: "T&D",
           },
           {
             title: "Sobeys Liquor Stony Plain",
@@ -1928,11 +1877,24 @@
             placeId: "ChIJ3XcCMvsloFMRhGKiLeLFknU",
           },
           {
-            title: "Sobeys Liquor Newcastle",
-            address1: "16831 127 St NW",
-            address2: "Edmonton, AB T6V 0T1, Canada",
-            coords: { lat: 53.630409162614676, lng: -113.53931945889549 },
-            placeId: "ChIJvSbL5_4koFMRxHBBTl9hFvg",
+            title: "Sobeys Liquor Terwillegar",
+            info: "Thick & Dirty here",
+            address1: "Terwillegar centre",
+            address2: "14272 23 Ave NW, Edmonton, AB T6R 3B9, Canada",
+            coords: { lat: 53.454940250356266, lng: -113.56730463558198 },
+            placeId: "ChIJoxU6TMYfoFMRA7R7PP973vY",
+            image: image_1,
+            label: "T&D",
+          },
+          {
+            title: "Sobeys Liquor Thickwood",
+            info: "Thick & Dirty here",
+            address1: "101 Signal Rd #27",
+            address2: "Fort McMurray, AB T9H 4N6, Canada",
+            coords: { lat: 56.73032245749026, lng: -111.42738763558198 },
+            placeId: "ChIJuUvd3OgIsFMRqiJnvUNBGl4",
+            image: image_1,
+            label: "T&D",
           },
           {
             title: "Spirits on 101",
@@ -1963,42 +1925,21 @@
             ],
           },
           {
-            title: "Super Value Liquor",
+            title: "Super Value Liquor Leduc",
             address1: "5204 50 St",
             address2: "Leduc, AB T9E 6Z6, Canada",
             coords: { lat: 53.26654771665091, lng: -113.55306173005944 },
             placeId: "ChIJ82l_6Kf5n1MRgKlaVeXMipQ",
           },
           {
-            title: "Super Value Liquor",
+            title: "Super Value Liquor Sherwood Park",
             address1: "973 Ordze Rd",
             address2: "Sherwood Park, AB T8A 4L7, Canada",
             coords: { lat: 53.51342885523232, lng: -113.3292713411045 },
             placeId: "ChIJr5D-eJYXoFMRXubFqn4_u1k",
           },
           {
-            title: "The Beer Locker",
-            address1: "4717 20 Ave",
-            address2: "Drayton Valley, AB T7A 1S9, Canada",
-            coords: { lat: 53.19338996722489, lng: -114.97598002331353 },
-            placeId: "ChIJi2D1caVHnlMR9ODgY-K8BMA",
-          },
-          {
-            title: "The Liquor Cabinet - St Albert Landing",
-            address1: "410 St Albert Trail #130",
-            address2: "St. Albert, AB T8N 3J6, Canada",
-            coords: { lat: 53.645415930468275, lng: -113.62742890552255 },
-            placeId: "ChIJu-pziUAloFMRsvf7DauvCj8",
-          },
-          {
-            title: "The Liquor Hutch",
-            address1: "150 Leva Ave #102",
-            address2: "Red Deer, AB T4E 0A5, Canada",
-            coords: { lat: 52.21118916681582, lng: -113.81751514110451 },
-            placeId: "ChIJkQxK_VkVdFMRSwssDkoDDwI",
-          },
-          {
-            title: "The Tipsy Liquor",
+            title: "Tipsy Liquor",
             address1: "5302 50 St Unit #117",
             address2: "Beaumont, AB T4X 1E5, Canada",
             coords: { lat: 53.355748556382004, lng: -113.41646877055226 },
@@ -2006,10 +1947,13 @@
           },
           {
             title: "Tofield Spirits Beer \u0026 Liquor Store",
+            info: "Thick & Dirty here",
             address1: "5028 53 Ave",
             address2: "Tofield, AB T0B 4J0, Canada",
             coords: { lat: 53.37070343360555, lng: -112.66848819877663 },
             placeId: "ChIJlSj-xG13oFMRHJ5apdWvLT0",
+            image: image_1,
+            label: "T&D",
           },
           {
             title: "Tops Liquor Store",
@@ -2019,14 +1963,14 @@
             placeId: "ChIJSwGuoBwioFMRWWzOf8v-pzk",
           },
           {
-            title: "Value Liquor Hub",
+            title: "Value Liquor Hub Jasper Ave",
             address1: "12068 Jasper Ave",
             address2: "Edmonton, AB T5K 0P3, Canada",
             coords: { lat: 53.54117555099628, lng: -113.53016057055227 },
             placeId: "ChIJf-EuACwioFMRl3UGmTiAj-I",
           },
           {
-            title: "Value liquor hub",
+            title: "Value liquor hub Sherwood Park",
             address1: "916 Ash St A",
             address2: "Sherwood Park, AB T8A 2G1, Canada",
             coords: { lat: 53.513084819769226, lng: -113.31545383065375 },
@@ -2055,10 +1999,13 @@
           },
           {
             title: "Wainwright Liquor \u0026 Cold Beer Store Ltd",
+            info: "Thick & Dirty here",
             address1: "1206 10 St",
             address2: "Wainwright, AB T9W 1E3, Canada",
             coords: { lat: 52.841185068288034, lng: -110.85282831408615 },
             placeId: "ChIJ5edySpnWC1MRa_HTxv852UU",
+            image: image_1,
+            label: "T&D",
           },
           {
             title: "Westmount Liquor Hub",
@@ -2075,15 +2022,28 @@
             placeId: "ChIJsbhhwzkfoFMRi_0EHDpJ-UQ",
           },
           {
+            title: "Wild Orchid Liquor Co",
+            info: "Thick & Dirty here",
+            address1: "100-1336 Switzer Dr",
+            address2: "Hinton, AB T7V 2C1, Canada",
+            coords: { lat: 53.3997208063201, lng: -117.58766940370484 },
+            placeId: "ChIJ2aHvAOSNnFMRK32QL5YCB-8",
+            image: image_1,
+            label: "T&D",
+          },
+          {
             title: "Wild Rose Co-op Liquor Store",
+            info: "Thick & Dirty here",
             address1: "5026 50 St",
             address2: "Killam, AB T0B 2L0, Canada",
             coords: { lat: 52.792065537884035, lng: -111.85686770552253 },
             placeId: "ChIJOba3WID_ClMR3nfnR4j420k",
+            image: image_1,
+            label: "T&D",
           },
         ],
         mapOptions: {
-          center: { lat: 38.0, lng: -100.0 },
+          center: { lat: 53.5, lng: -113.3 },
           fullscreenControl: true,
           mapTypeControl: false,
           streetViewControl: false,
@@ -2113,6 +2073,7 @@
           <button class="select-location">
             <h2 class="name">{{title}}</h2>
           </button>
+          <div class="address"><b>{{info}}</b></div>
           <div class="address">{{address1}}<br>{{address2}}</div>
           <div class="options">
             <div class="option-container">
@@ -2192,14 +2153,14 @@
               clip-rule="evenodd"
               d="M22.9976 11.5003C22.9976 13.2137 22.7083 14.9123 21.8025 16.7056C18.6321 22.9832 12.7449 24.3314 12.2758 30.7085C12.2448 31.1294 11.9286 31.4744 11.4973 31.4744C11.0689 31.4744 10.7527 31.1294 10.7218 30.7085C10.2527 24.3314 4.3655 22.9832 1.19504 16.7056C0.289306 14.9123 0 13.2137 0 11.5003C0 5.13275 5.14557 0 11.5003 0C17.852 0 22.9976 5.13275 22.9976 11.5003Z"
               fill="#4285F4"
-            ></path>
+            />
             <path
               fill-rule="evenodd"
               clip-rule="evenodd"
               transform="translate(5.5,5.5)"
               d="M6 8.84091L9.708 11L8.724 6.92961L12 4.19158L7.6856 3.83881L6 0L4.3144 3.83881L0 4.19158L3.276 6.92961L2.292 11L6 8.84091Z"
               fill="#FBE15C"
-            ></path>
+            />
           </svg>
         </div>
         <h2>{{location.title}}</h2>
@@ -2349,24 +2310,5 @@
       async
       defer
     ></script>
-    <script type="module">
-      // Import the functions you need from the SDKs you need
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-app.js";
-      // TODO: Add SDKs for Firebase products that you want to use
-      // https://firebase.google.com/docs/web/setup#available-libraries
-
-      // Your web app's Firebase configuration
-      const firebaseConfig = {
-        apiKey: "AIzaSyDODrylR-oS59VJ3Di4wGljI9KTiX0zNDE",
-        authDomain: "hawke-map.firebaseapp.com",
-        projectId: "hawke-map",
-        storageBucket: "hawke-map.appspot.com",
-        messagingSenderId: "419006557651",
-        appId: "1:419006557651:web:931456f6d62ed01b425326",
-      };
-
-      // Initialize Firebase
-      const app = initializeApp(firebaseConfig);
-    </script>
   </body>
 </html>
